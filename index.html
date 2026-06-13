@@ -3,7 +3,33 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>FIFA World Cup 2026 — Bracket Builder</title>
+
+<!-- SEO -->
+<title>World Cup 26 Bracket Predictor — Predict the 2026 Knockout Bracket</title>
+<meta name="description" content="Build and share your FIFA World Cup 2026 bracket. Set all 12 group standings, rank the best third-placed teams, predict every knockout match from the Round of 32 to the Final, and export your bracket as PNG or PDF." />
+<meta name="keywords" content="World Cup 2026, FIFA World Cup, bracket predictor, bracket builder, knockout bracket, Round of 32, tournament predictor, soccer, football, 2026 World Cup, Canada Mexico USA" />
+<meta name="author" content="WC26 Bracket Predictor" />
+<meta name="theme-color" content="#0a0a16" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="/" />
+
+<!-- Open Graph / link preview -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="World Cup 26 Bracket Predictor" />
+<meta property="og:title" content="World Cup 26 Bracket Predictor" />
+<meta property="og:description" content="Predict the entire FIFA World Cup 2026 knockout bracket — groups, third-place ranking, and every match through to the Final. Build, save, and share yours." />
+<meta property="og:image" content="og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<!-- Twitter card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="World Cup 26 Bracket Predictor" />
+<meta name="twitter:description" content="Predict the entire FIFA World Cup 2026 knockout bracket and share it with friends." />
+<meta name="twitter:image" content="og-image.png" />
+
+<!-- Favicon: original WC26 trophy crest (SVG, no external file) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff2e88'/%3E%3Cstop offset='.4' stop-color='%23a855f7'/%3E%3Cstop offset='.7' stop-color='%2336a3ff'/%3E%3Cstop offset='1' stop-color='%232bd9c4'/%3E%3C/linearGradient%3E%3ClinearGradient id='gold' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ffe27a'/%3E%3Cstop offset='1' stop-color='%23ffb300'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='10' fill='%230a0a16'/%3E%3Ccircle cx='24' cy='23' r='17' fill='none' stroke='url(%23g)' stroke-width='2.5'/%3E%3Cpath d='M18 12h12v4c0 4.5-2.7 7-6 7s-6-2.5-6-7v-4z' fill='url(%23gold)'/%3E%3Crect x='22.5' y='23' width='3' height='4' fill='url(%23gold)'/%3E%3Crect x='19' y='27' width='10' height='2.5' rx='1.2' fill='url(%23gold)'/%3E%3Ctext x='24' y='41' text-anchor='middle' font-size='8' font-weight='900' fill='%23fff' font-family='Arial'%3E26%3C/text%3E%3C/svg%3E" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
@@ -49,6 +75,17 @@
   .dragging{opacity:.4}
   @keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
   .trophy-shine{background:linear-gradient(110deg,#f5c518 25%,#fff6c2 50%,#f5c518 75%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite}
+  /* bracket */
+  .bk-card{position:absolute;border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,.14);background:rgba(20,20,40,.94)}
+  .bk-team{display:flex;align-items:center;gap:7px;padding:7px 10px;cursor:pointer;transition:background .15s}
+  .bk-team:hover{background:rgba(255,46,136,.16)}
+  .bk-team.win{background:linear-gradient(90deg,rgba(255,46,136,.30),rgba(168,85,247,.20))}
+  .bk-team.lose{opacity:.4}
+  .bk-team.tbd{cursor:default;color:rgba(255,255,255,.3);font-style:italic}
+  .bk-code{font-weight:700;font-size:15px;letter-spacing:.02em}
+  .bk-conn{position:absolute;inset:0;pointer-events:none;overflow:visible}
+  .locked{opacity:.45;cursor:not-allowed}
+  .export-sheet{position:fixed;left:-99999px;top:0}
 </style>
 </head>
 <body>
@@ -376,7 +413,7 @@ function MatchCard({m, teams, winnerOf, onPick}){
   );
 }
 
-function Knockout({resolved, onPick}){
+function KnockoutList({resolved, onPick}){
   const rounds = [
     {key:'R32', list:R32},
     ...['R16','QF','SF'].map(r=>({key:r, list:LATER.filter(m=>m.round===r)})),
@@ -389,7 +426,6 @@ function Knockout({resolved, onPick}){
   },[resolved]);
   return (
     <div>
-      <SectionHead title="Knockout Stage" sub="Tap a team to send them through. Winners advance automatically to the next round." />
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-1 px-1">
         {rounds.map(r=>(
           <button key={r.key} onClick={()=>setActive(r.key)}
@@ -408,6 +444,185 @@ function Knockout({resolved, onPick}){
     </div>
   );
 }
+
+/* ============================================================
+   VISUAL BRACKET LAYOUT (shared by screen + export)
+   ============================================================ */
+const BK = (()=>{
+  const cardW=186, cardH=64, pitch=84, PAD=28;
+  const R32L=[74,77,73,75,83,84,81,82], R32R=[76,78,79,80,86,88,85,87];
+  const leftX=[0,210,420,630], rightX=[1772,1562,1352,1142], finalX=886, totalW=1958;
+  const slotC = i => PAD + i*pitch + cardH/2;
+  function layout(){
+    const pos={};
+    const place=(id,x,yc)=>pos[id]={x, y:yc-cardH/2, yc};
+    R32L.forEach((id,i)=>place(id,leftX[0],slotC(i)));
+    R32R.forEach((id,i)=>place(id,rightX[0],slotC(i)));
+    const round=(ids,lx,rx)=>ids.forEach(m=>{
+      const f1=pos[m.a.w], f2=pos[m.b.w]; const yc=(f1.yc+f2.yc)/2;
+      place(m.id, f1.x<finalX?lx:rx, yc);
+    });
+    round(LATER.filter(m=>m.round==='R16'),leftX[1],rightX[1]);
+    round(LATER.filter(m=>m.round==='QF'),leftX[2],rightX[2]);
+    round(LATER.filter(m=>m.round==='SF'),leftX[3],rightX[3]);
+    const yMid=(pos[101].yc+pos[102].yc)/2;
+    place(104,finalX,yMid);
+    place(103,finalX,yMid+172);
+    const height = slotC(7)+cardH/2+PAD;
+    return {pos, cardW, cardH, totalW, height, finalX};
+  }
+  function connectors(pos){
+    const segs=[];
+    LATER.filter(m=>m.id!==103).forEach(m=>{
+      [m.a.w,m.b.w].forEach(fid=>{
+        const c=pos[fid], p=pos[m.id]; const childLeft=c.x<p.x;
+        const cx=childLeft?c.x+cardW:c.x, px=childLeft?p.x:p.x+cardW;
+        const mx=(cx+px)/2; segs.push(`M${cx} ${c.yc} H${mx} V${p.yc} H${px}`);
+      });
+    });
+    return segs;
+  }
+  const allIds=[...R32L,...R32R,...LATER.map(m=>m.id)];
+  return {layout, connectors, allIds, cardW, cardH, totalW};
+})();
+
+function BracketMatch({id, teams, winnerOf, onPick, pos}){
+  const t=teams[id]||{}, w=winnerOf(id), p=pos[id]; if(!p) return null;
+  const label = id===104?'FINAL' : id===103?'3RD PLACE' : null;
+  const row=(code)=>{
+    const win=w&&w===code, lose=w&&code&&w!==code;
+    return <div className={'bk-team '+(!code?'tbd ':win?'win ':lose?'lose ':'')}
+      onClick={code&&onPick?()=>onPick(id,code):undefined}>
+      <span style={{fontSize:18,lineHeight:1}}>{code?TEAMS[code].flag:'🏳️'}</span>
+      <span className="bk-code">{code||'TBD'}</span>
+    </div>;
+  };
+  return (
+    <div className="bk-card" style={{left:p.x, top:p.y, width:BK.cardW,
+        boxShadow: id===104?'0 0 22px rgba(255,210,63,.35)':'none',
+        borderColor: id===104?'rgba(255,210,63,.5)':undefined}}>
+      {label && <div className="text-center text-[8px] font-bold tracking-widest py-0.5"
+          style={{color:id===104?'#ffd23f':'#9aa0c0',background:'rgba(0,0,0,.3)'}}>{label}</div>}
+      {row(t.home)}
+      <div style={{height:1,background:'rgba(255,255,255,.08)'}}/>
+      {row(t.away)}
+    </div>
+  );
+}
+
+function Bracket({resolved, onPick, fixedScale}){
+  const {pos,totalW,height}=useMemo(()=>BK.layout(),[]);
+  const segs=useMemo(()=>BK.connectors(pos),[pos]);
+  const wrapRef=useRef(); const [scale,setScale]=useState(fixedScale||1);
+  useEffect(()=>{
+    if(fixedScale){ setScale(fixedScale); return; }
+    const el=wrapRef.current; if(!el||typeof ResizeObserver==='undefined') return;
+    const fit=()=>{ const w=el.clientWidth; setScale(Math.min(1, Math.max(.6, w/totalW))); };
+    fit(); const ro=new ResizeObserver(fit); ro.observe(el); return ()=>ro.disconnect();
+  },[fixedScale,totalW]);
+  return (
+    <div ref={wrapRef} className="w-full" style={{overflowX:'auto'}}>
+      <div style={{width:totalW*scale, height:height*scale, position:'relative', margin:'0 auto'}}>
+        <div style={{width:totalW, height, position:'absolute', top:0, left:0, transformOrigin:'top left', transform:`scale(${scale})`}}>
+          <svg className="bk-conn" width={totalW} height={height} viewBox={`0 0 ${totalW} ${height}`}>
+            {segs.map((d,i)=><path key={i} d={d} fill="none" stroke="rgba(255,46,136,.5)" strokeWidth="2"/>)}
+          </svg>
+          {BK.allIds.map(id=>(
+            <BracketMatch key={id} id={id} teams={resolved.teams} winnerOf={resolved.winnerOf} onPick={onPick} pos={pos} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Knockout({resolved, onPick}){
+  const [view,setView]=useState('bracket');
+  const decided = R32.length + LATER.length;
+  const done = [...R32,...LATER].filter(m=>resolved.winnerOf(m.id)).length;
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black">Knockout Bracket</h2>
+          <p className="text-sm text-white/50">Tap a team to advance them. Winners flow through automatically. <span className="text-neon font-semibold">{done}/{decided}</span> picked.</p>
+        </div>
+        <div className="flex rounded-lg border border-white/10 overflow-hidden text-xs font-bold shrink-0">
+          {['bracket','list'].map(v=>(
+            <button key={v} onClick={()=>setView(v)}
+              className={'px-3 py-1.5 capitalize '+(view===v?'bg-neon text-pitch-950':'text-white/60 hover:text-white')}>{v}</button>
+          ))}
+        </div>
+      </div>
+      {view==='bracket' ? (
+        <div style={{width:'100vw', position:'relative', left:'50%', marginLeft:'-50vw', paddingLeft:'12px', paddingRight:'12px'}}>
+          <div className="glass rounded-2xl p-3 sm:p-4">
+            <Bracket resolved={resolved} onPick={onPick} />
+            <p className="text-center text-[11px] text-white/35 mt-2">Drag horizontally if it overflows · switch to <b>List</b> view for easier tapping on mobile.</p>
+          </div>
+        </div>
+      ) : <KnockoutList resolved={resolved} onPick={onPick} />}
+    </div>
+  );
+}
+
+/* ============================================================
+   EXPORT SHEET (groups on both ends · bracket in the middle)
+   ============================================================ */
+function GroupMini({letter, order}){
+  return (
+    <div style={{marginBottom:18}}>
+      <div style={{fontSize:14,fontWeight:800,letterSpacing:'.08em',color:'#ff6aa9',marginBottom:7}}>GROUP {letter}</div>
+      {order.map((code,i)=>(
+        <div key={code} style={{display:'flex',alignItems:'center',gap:9,padding:'7px 9px',marginBottom:4,borderRadius:7,
+            background:i<2?'rgba(255,46,136,.15)':i===2?'rgba(255,210,63,.12)':'rgba(255,255,255,.04)'}}>
+          <span style={{width:15,flexShrink:0,textAlign:'center',fontSize:12,fontWeight:800,color:i<2?'#ff6aa9':i===2?'#ffd23f':'#7b8099'}}>{i+1}</span>
+          <span style={{fontSize:18,flexShrink:0,lineHeight:1}}>{TEAMS[code].flag}</span>
+          <span style={{fontSize:15,fontWeight:600,lineHeight:1.25,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',minWidth:0}}>{TEAMS[code].name}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const ExportSheet = React.forwardRef(({state, resolved}, ref)=>{
+  const {champion, runnerUp, third}=resolved;
+  const half=GROUP_LETTERS.slice(0,6), half2=GROUP_LETTERS.slice(6);
+  const PANEL=360, GAP=28, PADX=36;
+  const W = PADX*2 + PANEL*2 + GAP*2 + BK.totalW;
+  const Panel=({letters})=>(
+    <div style={{width:PANEL,flexShrink:0}}>{letters.map(g=><GroupMini key={g} letter={g} order={state.standings[g]} />)}</div>
+  );
+  return (
+    <div ref={ref} className="export-sheet">
+      <div style={{width:W, background:'linear-gradient(160deg,#0a0a16,#14122a)', padding:`30px ${PADX}px 26px`, color:'#eef0ff', fontFamily:'Inter,system-ui,sans-serif'}}>
+        <div style={{height:6, borderRadius:4, background:'linear-gradient(90deg,#ff2e88,#a855f7,#36a3ff,#2bd9c4,#ffd23f)', marginBottom:22}}/>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:24}}>
+          <div style={{display:'flex',alignItems:'center',gap:16}}>
+            <div style={{fontSize:46}}>🏆</div>
+            <div>
+              <div style={{fontSize:40,fontWeight:900,letterSpacing:'-.5px',color:'#eef0ff'}}>WORLD CUP 26 — MY BRACKET</div>
+              <div style={{fontSize:15,color:'#9aa0c0',marginTop:4}}>🇨🇦 🇲🇽 🇺🇸 · Predicted knockout bracket</div>
+            </div>
+          </div>
+          {champion && (
+            <div style={{textAlign:'right'}}>
+              <div style={{fontSize:13,fontWeight:800,letterSpacing:'.2em',color:'#ffd23f'}}>🏆 CHAMPION</div>
+              <div style={{fontSize:32,fontWeight:900}}>{TEAMS[champion].flag} {TEAMS[champion].name}</div>
+              <div style={{fontSize:14,color:'#9aa0c0',marginTop:2}}>2nd {runnerUp?TEAMS[runnerUp].name:'—'} · 3rd {third?TEAMS[third].name:'—'}</div>
+            </div>
+          )}
+        </div>
+        <div style={{display:'flex',gap:GAP,alignItems:'center',justifyContent:'center'}}>
+          <Panel letters={half} />
+          <div style={{width:BK.totalW,flexShrink:0}}><Bracket resolved={resolved} onPick={null} fixedScale={1} /></div>
+          <Panel letters={half2} />
+        </div>
+        <div style={{fontSize:12,color:'#71768f',marginTop:18,textAlign:'center'}}>Unofficial fan-made predictor · Not affiliated with FIFA · Generated with the WC26 Bracket Predictor</div>
+      </div>
+    </div>
+  );
+});
 
 /* ============================================================
    RESULTS
@@ -508,33 +723,46 @@ const STEPS = [
   {key:'knockout', label:'Knockout'},
   {key:'results', label:'Results'},
 ];
+const STEP_IDX = Object.fromEntries(STEPS.map((s,i)=>[s.key,i]));
+function initMaxStep(s){
+  try{ const r=resolveBracket(s); if(r.champion) return 3; if(Object.keys(s.picks||{}).length) return 2; }catch(e){}
+  return 0;
+}
 
 function App(){
   const [state, setState] = useState(loadInitial);
   const [step, setStep] = useState('groups');
+  const [maxStep, setMaxStep] = useState(()=>initMaxStep(loadInitial()));
   const [toast, setToast] = useState(null);
-  const exportRef = useRef(null);
+  const [busy, setBusy] = useState(false);
+  const sheetRef = useRef(null);
 
   // persist
   useEffect(()=>{ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }, [state]);
 
   const resolved = useMemo(()=>resolveBracket(state), [state]);
+  const champ = !!resolved.champion;                       // Final decided → results unlock
+  const complete = champ && !!resolved.third;              // Final + 3rd-place done → export unlocks
+  useEffect(()=>{ if(champ) setMaxStep(m=>Math.max(m,3)); }, [champ]);
 
   const flash = msg => { setToast(msg); setTimeout(()=>setToast(null), 2200); };
+  const goto = key => {
+    if(STEP_IDX[key] <= maxStep){ setStep(key); window.scrollTo({top:0,behavior:'smooth'}); }
+    else flash('🔒 Complete the previous step first');
+  };
+  const unlockTo = key => setMaxStep(m=>Math.max(m, STEP_IDX[key]));
 
   const setStandings = (g, order)=> setState(s=>({...s, standings:{...s.standings, [g]:order}}));
   const setThirdRanking = order => setState(s=>({...s, thirdRanking:order}));
   const onPick = (id, code)=> setState(s=>{
     const picks={...s.picks};
     if(picks[id]===code) delete picks[id]; else picks[id]=code;
-    // clear downstream picks that depended on the changed match
-    const cleared = clearDownstream(id, {...s, picks});
-    return {...s, picks:cleared};
+    return {...s, picks:clearDownstream(id, {...s, picks})};
   });
 
-  const doRandom = ()=>{ setState(simulate('random')); flash('🎲 Random bracket generated'); setStep('results'); };
-  const doSim = ()=>{ setState(simulate('sim')); flash('🤖 Simulated by FIFA ranking'); setStep('results'); };
-  const doReset = ()=>{ setState(defaultState()); flash('Reset'); setStep('groups'); };
+  const doRandom = ()=>{ setState(simulate('random')); setMaxStep(3); flash('🎲 Random bracket generated'); setStep('results'); };
+  const doSim    = ()=>{ setState(simulate('sim'));    setMaxStep(3); flash('🤖 Simulated by FIFA ranking'); setStep('results'); };
+  const doReset  = ()=>{ setState(defaultState()); setMaxStep(0); flash('Reset'); setStep('groups'); };
 
   const doShare = async ()=>{
     const url = location.origin+location.pathname+'#s='+encodeState(state);
@@ -543,19 +771,25 @@ function App(){
   };
 
   const exportImage = async (asPdf)=>{
-    flash('Rendering image…');
-    const node = exportRef.current;
-    const canvas = await html2canvas(node, {backgroundColor:'#04150c', scale:2, useCORS:true});
-    if(asPdf){
-      const {jsPDF}=window.jspdf;
-      const img=canvas.toDataURL('image/png');
-      const pdf=new jsPDF({orientation:canvas.width>canvas.height?'l':'p', unit:'px', format:[canvas.width,canvas.height]});
-      pdf.addImage(img,'PNG',0,0,canvas.width,canvas.height);
-      pdf.save('wc2026-bracket.pdf'); flash('📄 PDF downloaded');
-    } else {
-      const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='wc2026-bracket.png'; a.click();
-      flash('🖼️ PNG downloaded');
-    }
+    if(!complete){ flash('🔒 Finish your bracket to unlock export'); return; }
+    setBusy(true); flash('Rendering your bracket…');
+    await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,80)));
+    try{
+      const node = sheetRef.current.firstChild; // the fixed-width composition
+      const w = node.offsetWidth || 2700;
+      const canvas = await html2canvas(node, {backgroundColor:'#0a0a16', scale:2, useCORS:true, width:w, windowWidth:w+60});
+      if(asPdf){
+        const {jsPDF}=window.jspdf;
+        const img=canvas.toDataURL('image/png');
+        const pdf=new jsPDF({orientation:'l', unit:'px', format:[canvas.width,canvas.height]});
+        pdf.addImage(img,'PNG',0,0,canvas.width,canvas.height);
+        pdf.save('wc2026-bracket.pdf'); flash('📄 PDF downloaded');
+      } else {
+        const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='wc2026-bracket.png'; a.click();
+        flash('🖼️ PNG downloaded');
+      }
+    } catch(e){ flash('Export failed — try again'); }
+    setBusy(false);
   };
 
   return (
@@ -580,36 +814,41 @@ function App(){
             <ToolBtn onClick={doRandom}>🎲 Random</ToolBtn>
             <ToolBtn onClick={doSim}>🤖 Simulate</ToolBtn>
             <ToolBtn onClick={doShare}>🔗 Share</ToolBtn>
-            <ToolBtn onClick={()=>exportImage(false)}>🖼️ PNG</ToolBtn>
-            <ToolBtn onClick={()=>exportImage(true)}>📄 PDF</ToolBtn>
+            <ToolBtn onClick={()=>exportImage(false)} disabled={!complete||busy} title={complete?'Download bracket PNG':'Finish your bracket to unlock'}>🖼️ PNG</ToolBtn>
+            <ToolBtn onClick={()=>exportImage(true)} disabled={!complete||busy} title={complete?'Download bracket PDF':'Finish your bracket to unlock'}>📄 PDF</ToolBtn>
             <ToolBtn onClick={doReset} danger>↺ Reset</ToolBtn>
           </div>
         </div>
         {/* STEP NAV */}
         <div className="max-w-6xl mx-auto px-4 pb-2 flex gap-1.5">
-          {STEPS.map((s,i)=>(
-            <button key={s.key} onClick={()=>setStep(s.key)}
-              className={'flex-1 py-2 rounded-lg text-xs font-bold border transition '
-                +(step===s.key?'bg-neon text-pitch-950 border-neon':'bg-white/5 text-white/60 border-white/10 hover:border-neon/40')}>
-              <span className="opacity-60 mr-1">{i+1}</span>{s.label}
-            </button>
-          ))}
+          {STEPS.map((s,i)=>{
+            const locked = i>maxStep;
+            return (
+              <button key={s.key} onClick={()=>goto(s.key)} disabled={locked}
+                className={'flex-1 py-2 rounded-lg text-xs font-bold border transition '
+                  +(step===s.key?'bg-neon text-pitch-950 border-neon'
+                    : locked?'bg-white/[.02] text-white/25 border-white/5 cursor-not-allowed'
+                    : 'bg-white/5 text-white/60 border-white/10 hover:border-neon/40')}>
+                <span className="mr-1 opacity-70">{locked?'🔒':i+1}</span>{s.label}
+              </button>
+            );
+          })}
         </div>
       </header>
 
       {/* BODY */}
-      <main ref={exportRef} className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-6xl mx-auto px-4 py-6">
         {step==='groups'   && <GroupStage state={state} setStandings={setStandings} />}
         {step==='thirds'   && <ThirdPlace state={state} setThirdRanking={setThirdRanking} />}
         {step==='knockout' && <Knockout resolved={resolved} onPick={onPick} />}
         {step==='results'  && <Results resolved={resolved} />}
       </main>
 
-      {/* FOOTER NAV */}
-      <div className="max-w-6xl mx-auto px-4 pb-6 flex justify-between">
-        <NavBtn dir="prev" step={step} setStep={setStep} />
-        <NavBtn dir="next" step={step} setStep={setStep} />
-      </div>
+      {/* STAGE FOOTER (gated progression) */}
+      <StageFooter step={step} champ={champ} complete={complete} goto={goto} unlockTo={unlockTo} setStep={setStep} />
+
+      {/* off-screen export composition */}
+      <ExportSheet ref={sheetRef} state={state} resolved={resolved} />
       <footer className="max-w-6xl mx-auto px-4 pb-10 text-center">
         <div className="spectrum-bar w-24 mx-auto rounded-full mb-3 opacity-60" />
         <p className="text-[11px] text-white/35 leading-relaxed">
@@ -646,11 +885,33 @@ function Emblem(){
     </svg>
   );
 }
-function ToolBtn({children, onClick, danger}){
-  return <button onClick={onClick}
+function ToolBtn({children, onClick, danger, disabled, title}){
+  return <button onClick={disabled?undefined:onClick} disabled={disabled} title={title}
     className={'px-2.5 py-1.5 rounded-lg font-semibold border transition '
-      +(danger?'border-red-500/30 text-red-300 hover:bg-red-500/10':'border-white/10 text-white/80 hover:border-neon/50 hover:text-neon')}>
+      +(disabled?'border-white/5 text-white/25 cursor-not-allowed'
+        :danger?'border-red-500/30 text-red-300 hover:bg-red-500/10'
+        :'border-white/10 text-white/80 hover:border-neon/50 hover:text-neon')}>
     {children}</button>;
+}
+
+function StageFooter({step, champ, complete, goto, unlockTo, setStep}){
+  const proceed = to => { unlockTo(to); setStep(to); window.scrollTo({top:0,behavior:'smooth'}); };
+  const Btn = ({onClick,children,primary,disabled})=>(
+    <button onClick={disabled?undefined:onClick} disabled={disabled}
+      className={'px-5 py-2.5 rounded-xl font-bold text-sm transition '
+        +(disabled?'bg-white/5 text-white/30 cursor-not-allowed'
+          :primary?'spectrum text-pitch-950 hover:opacity-90 shadow-lg':'glass hover:border-neon/50')}>{children}</button>
+  );
+  const prev = STEP_IDX[step]>0 ? STEPS[STEP_IDX[step]-1] : null;
+  return (
+    <div className="max-w-6xl mx-auto px-4 pb-8 flex justify-between items-center gap-3">
+      {prev ? <Btn onClick={()=>goto(prev.key)}>← {prev.label}</Btn> : <span/>}
+      {step==='groups'   && <Btn primary onClick={()=>proceed('thirds')}>Continue to 3rd Place →</Btn>}
+      {step==='thirds'   && <Btn primary onClick={()=>proceed('knockout')}>Continue to Knockout →</Btn>}
+      {step==='knockout' && <Btn primary disabled={!champ} onClick={()=>proceed('results')}>{champ?'View Results →':'🔒 Pick the Final first'}</Btn>}
+      {step==='results'  && <span className="text-xs text-white/40 self-center text-right">{complete?'Export your bracket with 🖼️ PNG / 📄 PDF above':'Pick the 3rd-place match in Knockout to unlock export'}</span>}
+    </div>
+  );
 }
 function NavBtn({dir, step, setStep}){
   const i = STEPS.findIndex(s=>s.key===step);
