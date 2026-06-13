@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FIFA World Cup 2026 — Bracket Builder</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          pitch: { 950:'#0a0a16', 900:'#0e0e20', 800:'#17172e' },
+          neon: { DEFAULT:'#ff2e88', soft:'#d11e6b' },   // primary accent (WC26 magenta)
+          electric:'#36a3ff', teal:'#2bd9c4', grape:'#a855f7', gold:'#ffd23f',
+        },
+        fontFamily: { display: ['Inter','system-ui','sans-serif'] },
+      }
+    }
+  }
+</script>
+<style>
+  html,body{background:#0a0a16;color:#eef0ff;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  *{scrollbar-width:thin;scrollbar-color:#ff2e88 #14142b}
+  ::-webkit-scrollbar{height:8px;width:8px}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(#ff2e88,#a855f7);border-radius:8px}
+  .glass{background:rgba(22,22,46,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.10)}
+  .spectrum{background:linear-gradient(90deg,#ff2e88,#a855f7,#36a3ff,#2bd9c4,#ffd23f)}
+  .spectrum-text{background:linear-gradient(90deg,#ff2e88,#a855f7,#36a3ff,#2bd9c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .spectrum-bar{height:4px;background:linear-gradient(90deg,#ff2e88,#a855f7,#36a3ff,#2bd9c4,#ffd23f)}
+  .pitch-bg{background:
+     radial-gradient(900px 420px at 8% -8%, rgba(255,46,136,.20), transparent 60%),
+     radial-gradient(900px 420px at 92% -6%, rgba(54,163,255,.18), transparent 60%),
+     radial-gradient(1100px 600px at 50% 110%, rgba(168,85,247,.16), transparent 60%),
+     repeating-linear-gradient(180deg,#0a0a16 0px,#0a0a16 38px,#0e0e20 38px,#0e0e20 76px)}
+  @keyframes pop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+  .pop{animation:pop .32s cubic-bezier(.2,.8,.2,1)}
+  @keyframes slidein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .slidein{animation:slidein .35s ease both}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(34,227,107,.0)}50%{box-shadow:0 0 28px 2px rgba(34,227,107,.35)}}
+  .glow{animation:glow 2.2s ease-in-out infinite}
+  .drag-over{outline:2px dashed #22e36b;outline-offset:2px}
+  .dragging{opacity:.4}
+  @keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .trophy-shine{background:linear-gradient(110deg,#f5c518 25%,#fff6c2 50%,#f5c518 75%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+/* ============================================================
+   DATA LAYER  — teams, groups, bracket config (config-driven)
+   Source: official FWC26 Match Schedule (v17). Mapping is data,
+   not hardcoded in components, so it can be swapped if FIFA
+   updates official assignments.
+   ============================================================ */
+
+const TEAMS = {
+  MEX:{name:'Mexico',flag:'🇲🇽',rank:17}, RSA:{name:'South Africa',flag:'🇿🇦',rank:60},
+  KOR:{name:'Korea Republic',flag:'🇰🇷',rank:23}, CZE:{name:'Czechia',flag:'🇨🇿',rank:43},
+  CAN:{name:'Canada',flag:'🇨🇦',rank:30}, BIH:{name:'Bosnia & Herzegovina',flag:'🇧🇦',rank:74},
+  QAT:{name:'Qatar',flag:'🇶🇦',rank:54}, SUI:{name:'Switzerland',flag:'🇨🇭',rank:20},
+  BRA:{name:'Brazil',flag:'🇧🇷',rank:5}, MAR:{name:'Morocco',flag:'🇲🇦',rank:12},
+  HAI:{name:'Haiti',flag:'🇭🇹',rank:83}, SCO:{name:'Scotland',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',rank:39},
+  USA:{name:'USA',flag:'🇺🇸',rank:16}, PAR:{name:'Paraguay',flag:'🇵🇾',rank:40},
+  AUS:{name:'Australia',flag:'🇦🇺',rank:26}, TUR:{name:'Türkiye',flag:'🇹🇷',rank:27},
+  GER:{name:'Germany',flag:'🇩🇪',rank:9}, CUW:{name:'Curaçao',flag:'🇨🇼',rank:90},
+  CIV:{name:"Côte d'Ivoire",flag:'🇨🇮',rank:41}, ECU:{name:'Ecuador',flag:'🇪🇨',rank:24},
+  NED:{name:'Netherlands',flag:'🇳🇱',rank:6}, JPN:{name:'Japan',flag:'🇯🇵',rank:18},
+  SWE:{name:'Sweden',flag:'🇸🇪',rank:35}, TUN:{name:'Tunisia',flag:'🇹🇳',rank:50},
+  BEL:{name:'Belgium',flag:'🇧🇪',rank:8}, EGY:{name:'Egypt',flag:'🇪🇬',rank:36},
+  IRN:{name:'IR Iran',flag:'🇮🇷',rank:19}, NZL:{name:'New Zealand',flag:'🇳🇿',rank:86},
+  ESP:{name:'Spain',flag:'🇪🇸',rank:2}, CPV:{name:'Cabo Verde',flag:'🇨🇻',rank:70},
+  KSA:{name:'Saudi Arabia',flag:'🇸🇦',rank:58}, URU:{name:'Uruguay',flag:'🇺🇾',rank:15},
+  FRA:{name:'France',flag:'🇫🇷',rank:3}, SEN:{name:'Senegal',flag:'🇸🇳',rank:21},
+  IRQ:{name:'Iraq',flag:'🇮🇶',rank:58}, NOR:{name:'Norway',flag:'🇳🇴',rank:28},
+  ARG:{name:'Argentina',flag:'🇦🇷',rank:1}, ALG:{name:'Algeria',flag:'🇩🇿',rank:37},
+  AUT:{name:'Austria',flag:'🇦🇹',rank:22}, JOR:{name:'Jordan',flag:'🇯🇴',rank:62},
+  POR:{name:'Portugal',flag:'🇵🇹',rank:7}, COD:{name:'Congo DR',flag:'🇨🇩',rank:56},
+  UZB:{name:'Uzbekistan',flag:'🇺🇿',rank:57}, COL:{name:'Colombia',flag:'🇨🇴',rank:13},
+  ENG:{name:'England',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',rank:4}, CRO:{name:'Croatia',flag:'🇭🇷',rank:10},
+  GHA:{name:'Ghana',flag:'🇬🇭',rank:73}, PAN:{name:'Panama',flag:'🇵🇦',rank:41},
+};
+
+// Group -> teams in official seeding order (used as default standing order)
+const GROUPS = {
+  A:['MEX','RSA','KOR','CZE'], B:['CAN','BIH','QAT','SUI'],
+  C:['BRA','MAR','HAI','SCO'], D:['USA','PAR','AUS','TUR'],
+  E:['GER','CUW','CIV','ECU'], F:['NED','JPN','SWE','TUN'],
+  G:['BEL','EGY','IRN','NZL'], H:['ESP','CPV','KSA','URU'],
+  I:['FRA','SEN','IRQ','NOR'], J:['ARG','ALG','AUT','JOR'],
+  K:['POR','COD','UZB','COL'], L:['ENG','CRO','GHA','PAN'],
+};
+const GROUP_LETTERS = Object.keys(GROUPS);
+
+// Round of 32 — sources: {t:'w'|'ru', g:Group}  or  {t:'3', combo:'eligible groups'}
+const R32 = [
+  {id:73, a:{t:'ru',g:'A'}, b:{t:'ru',g:'B'}},
+  {id:74, a:{t:'w',g:'E'},  b:{t:'3',combo:'ABCDF'}},
+  {id:75, a:{t:'w',g:'F'},  b:{t:'ru',g:'C'}},
+  {id:76, a:{t:'w',g:'C'},  b:{t:'ru',g:'F'}},
+  {id:77, a:{t:'w',g:'I'},  b:{t:'3',combo:'CDFGH'}},
+  {id:78, a:{t:'ru',g:'E'}, b:{t:'ru',g:'I'}},
+  {id:79, a:{t:'w',g:'A'},  b:{t:'3',combo:'CEFHI'}},
+  {id:80, a:{t:'w',g:'L'},  b:{t:'3',combo:'EHIJK'}},
+  {id:81, a:{t:'w',g:'D'},  b:{t:'3',combo:'BEFIJ'}},
+  {id:82, a:{t:'w',g:'G'},  b:{t:'3',combo:'AEHIJ'}},
+  {id:83, a:{t:'ru',g:'K'}, b:{t:'ru',g:'L'}},
+  {id:84, a:{t:'w',g:'H'},  b:{t:'ru',g:'J'}},
+  {id:85, a:{t:'w',g:'B'},  b:{t:'3',combo:'EFGIJ'}},
+  {id:86, a:{t:'w',g:'J'},  b:{t:'ru',g:'H'}},
+  {id:87, a:{t:'w',g:'K'},  b:{t:'3',combo:'DEIJL'}},
+  {id:88, a:{t:'ru',g:'D'}, b:{t:'ru',g:'G'}},
+];
+
+// Later rounds — sources: {w:matchId} winner, {l:matchId} loser
+const LATER = [
+  {id:89, round:'R16', a:{w:74}, b:{w:77}},
+  {id:90, round:'R16', a:{w:73}, b:{w:75}},
+  {id:91, round:'R16', a:{w:76}, b:{w:78}},
+  {id:92, round:'R16', a:{w:79}, b:{w:80}},
+  {id:93, round:'R16', a:{w:83}, b:{w:84}},
+  {id:94, round:'R16', a:{w:81}, b:{w:82}},
+  {id:95, round:'R16', a:{w:86}, b:{w:88}},
+  {id:96, round:'R16', a:{w:85}, b:{w:87}},
+  {id:97, round:'QF',  a:{w:89}, b:{w:90}},
+  {id:98, round:'QF',  a:{w:93}, b:{w:94}},
+  {id:99, round:'QF',  a:{w:91}, b:{w:92}},
+  {id:100,round:'QF',  a:{w:95}, b:{w:96}},
+  {id:101,round:'SF',  a:{w:97}, b:{w:98}},
+  {id:102,round:'SF',  a:{w:99}, b:{w:100}},
+  {id:103,round:'BRONZE', a:{l:101}, b:{l:102}},
+  {id:104,round:'FINAL',  a:{w:101}, b:{w:102}},
+];
+
+const THIRD_SLOTS = R32.filter(m=>m.b.t==='3').map(m=>({id:m.id, groups:m.b.combo.split('')}));
+const ROUND_META = {
+  R32:{label:'Round of 32'}, R16:{label:'Round of 16'}, QF:{label:'Quarter-finals'},
+  SF:{label:'Semi-finals'}, BRONZE:{label:'Third Place Match'}, FINAL:{label:'Final'},
+};
+
+/* ============================================================
+   BRACKET ENGINE
+   ============================================================ */
+
+// Bipartite matching: assign qualified third-place groups -> slots
+// respecting each slot's group-eligibility combo (augmenting paths).
+function matchThirds(qualifiedGroups, slots){
+  const matchSlot = {};      // slotIndex -> group
+  const matchGroup = {};     // group -> slotIndex
+  function augment(si, seen){
+    for(const g of slots[si].groups){
+      if(!qualifiedGroups.includes(g) || seen.has(g)) continue;
+      seen.add(g);
+      if(matchGroup[g]===undefined || augment(matchGroup[g], seen)){
+        matchSlot[si]=g; matchGroup[g]=si; return true;
+      }
+    }
+    return false;
+  }
+  for(let si=0; si<slots.length; si++) augment(si, new Set());
+  const out = {}; // matchId -> group
+  for(const si in matchSlot) out[slots[si].id] = matchSlot[si];
+  return out;
+}
+
+// Resolve the full bracket given current selections.
+function resolveBracket(state){
+  const { standings, thirdRanking, picks } = state;
+  const winner = g => standings[g][0];
+  const runner = g => standings[g][1];
+  const third  = g => standings[g][2];
+
+  const qualifiedThirds = thirdRanking.slice(0,8);            // top-8 group letters
+  const slotGroup = matchThirds(qualifiedThirds, THIRD_SLOTS); // matchId -> group
+
+  const teams = {}; // matchId -> {home, away}  (codes or null)
+  // R32
+  R32.forEach(m=>{
+    const side = s => s.t==='w'?winner(s.g) : s.t==='ru'?runner(s.g)
+                    : (slotGroup[m.id]?third(slotGroup[m.id]):null);
+    teams[m.id] = { home: side(m.a), away: side(m.b),
+                    thirdGroup: m.b.t==='3' ? (slotGroup[m.id]||null) : null };
+  });
+  const winnerOf = id => { const p=picks[id]; const t=teams[id]; if(!t)return null;
+    return (p && (p===t.home || p===t.away)) ? p : null; };
+  const loserOf = id => { const w=winnerOf(id); const t=teams[id];
+    if(!t||!w||!t.home||!t.away) return null; return w===t.home?t.away:t.home; };
+  // Later rounds (in id order so deps resolve)
+  LATER.forEach(m=>{
+    const ref = r => r.w!==undefined ? winnerOf(r.w) : loserOf(r.l);
+    teams[m.id] = { home: ref(m.a), away: ref(m.b), round:m.round };
+  });
+
+  return {
+    teams, slotGroup, winnerOf, loserOf, qualifiedThirds,
+    champion: winnerOf(104), runnerUp: loserOf(104), third: winnerOf(103),
+  };
+}
+
+const STRENGTH = code => 200 - (TEAMS[code]?.rank ?? 100); // higher = stronger
+const ALL_ROUND_IDS = { R32:R32.map(m=>m.id), ...LATER.reduce((a,m)=>{(a[m.round]=a[m.round]||[]).push(m.id);return a;},{}) };
+
+/* ============================================================
+   STATE  (persistence + URL share)
+   ============================================================ */
+const STORAGE_KEY = 'wc2026-bracket-v1';
+const defaultState = () => ({
+  standings: Object.fromEntries(GROUP_LETTERS.map(g=>[g,[...GROUPS[g]]])),
+  thirdRanking: [...GROUP_LETTERS],        // ranking of the 12 groups' third teams
+  picks: {},                               // matchId -> winning team code
+});
+
+function encodeState(s){
+  try { return btoa(unescape(encodeURIComponent(JSON.stringify(s)))); } catch(e){ return ''; }
+}
+function decodeState(str){
+  try { const s = JSON.parse(decodeURIComponent(escape(atob(str))));
+    if(s && s.standings && s.thirdRanking && s.picks) return s; } catch(e){}
+  return null;
+}
+function loadInitial(){
+  const hash = location.hash.replace(/^#/,'');
+  if(hash.startsWith('s=')){ const d = decodeState(hash.slice(2)); if(d) return d; }
+  try { const raw = localStorage.getItem(STORAGE_KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.standings) return d; } } catch(e){}
+  return defaultState();
+}
+
+/* ============================================================
+   GENERIC DRAG-AND-DROP REORDER LIST
+   ============================================================ */
+function ReorderList({items, onReorder, renderItem}){
+  const [dragIdx, setDragIdx] = useState(null);
+  const [overIdx, setOverIdx] = useState(null);
+  const move = (from,to)=>{ if(from===to||from==null||to==null)return;
+    const arr=[...items]; const [m]=arr.splice(from,1); arr.splice(to,0,m); onReorder(arr); };
+  return items.map((it,i)=>(
+    <div key={it.key}
+      draggable
+      onDragStart={e=>{setDragIdx(i); e.dataTransfer.effectAllowed='move';}}
+      onDragEnd={()=>{setDragIdx(null);setOverIdx(null);}}
+      onDragOver={e=>{e.preventDefault(); setOverIdx(i);}}
+      onDrop={e=>{e.preventDefault(); move(dragIdx,i); setDragIdx(null);setOverIdx(null);}}
+      className={(dragIdx===i?'dragging ':'')+(overIdx===i&&dragIdx!==i?'drag-over ':'')+'select-none'}>
+      {renderItem(it, i)}
+    </div>
+  ));
+}
+
+/* small UI helpers */
+const Flag = ({code,cls=''}) => <span className={'leading-none '+cls}>{TEAMS[code]?.flag||'🏳️'}</span>;
+const Pill = ({children,tone='neon'}) => {
+  const t = tone==='neon'?'bg-neon/15 text-neon border-neon/30':'bg-white/5 text-white/60 border-white/10';
+  return <span className={'text-[10px] font-semibold px-2 py-0.5 rounded-full border '+t}>{children}</span>;
+};
+
+/* ============================================================
+   GROUP STAGE
+   ============================================================ */
+function GroupCard({letter, order, onReorder}){
+  const items = order.map((code,i)=>({key:code, code, pos:i}));
+  return (
+    <div className="glass rounded-2xl p-3 slidein">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-bold text-sm tracking-wide">GROUP {letter}</h3>
+        <Pill tone="muted">drag to rank</Pill>
+      </div>
+      <div className="space-y-1.5">
+        <ReorderList items={items} onReorder={arr=>onReorder(letter, arr.map(x=>x.code))}
+          renderItem={(it)=>{
+            const qual = it.pos<2, third = it.pos===2;
+            return (
+              <div className={'flex items-center gap-2 rounded-xl px-2.5 py-2 cursor-grab active:cursor-grabbing border transition '
+                +(qual?'bg-neon/10 border-neon/30':third?'bg-amber-400/10 border-amber-400/25':'bg-white/[.03] border-white/5')}>
+                <span className={'w-5 h-5 grid place-items-center rounded-md text-[11px] font-bold '
+                  +(qual?'bg-neon text-pitch-950':third?'bg-amber-400 text-pitch-950':'bg-white/10 text-white/50')}>{it.pos+1}</span>
+                <Flag code={it.code} cls="text-lg" />
+                <span className="text-sm font-medium truncate flex-1">{TEAMS[it.code].name}</span>
+                {qual && <Pill>QUAL</Pill>}
+                {third && <Pill tone="muted">3rd</Pill>}
+                <span className="text-white/20 text-xs">⠿</span>
+              </div>
+            );
+          }} />
+      </div>
+    </div>
+  );
+}
+
+function GroupStage({state, setStandings}){
+  return (
+    <div>
+      <SectionHead title="Group Stage" sub="Drag teams to set the final standing in each of the 12 groups. Top 2 qualify directly; 3rd place enters the ranking." />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {GROUP_LETTERS.map(g=>(
+          <GroupCard key={g} letter={g} order={state.standings[g]}
+            onReorder={(letter,order)=>setStandings(letter,order)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   THIRD PLACE RANKING (drag & drop)
+   ============================================================ */
+function ThirdPlace({state, setThirdRanking}){
+  const items = state.thirdRanking.map((g,i)=>({key:g, g, code:state.standings[g][2], pos:i}));
+  return (
+    <div>
+      <SectionHead title="Best Third-Placed Teams" sub="Rank all 12 third-placed teams. The top 8 qualify for the Round of 32; the bottom 4 are eliminated." />
+      <div className="glass rounded-2xl p-3 max-w-2xl mx-auto">
+        <div className="space-y-1.5">
+          <ReorderList items={items} onReorder={arr=>setThirdRanking(arr.map(x=>x.g))}
+            renderItem={(it)=>{
+              const qual = it.pos<8;
+              return (
+                <div className={'flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-grab active:cursor-grabbing border transition '
+                  +(qual?'bg-neon/10 border-neon/30':'bg-white/[.02] border-white/5 opacity-50')}>
+                  <span className={'w-6 h-6 grid place-items-center rounded-lg text-xs font-bold '
+                    +(qual?'bg-neon text-pitch-950':'bg-white/10 text-white/40')}>{it.pos+1}</span>
+                  <Flag code={it.code} cls="text-xl" />
+                  <span className="text-sm font-semibold flex-1 truncate">{TEAMS[it.code].name}</span>
+                  <Pill tone="muted">Group {it.g}</Pill>
+                  {qual ? <Pill>QUALIFIES</Pill> : <span className="text-[10px] font-semibold text-red-400/80">ELIMINATED</span>}
+                  <span className="text-white/20">⠿</span>
+                </div>
+              );
+            }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   KNOCKOUT
+   ============================================================ */
+function TeamRow({code, isWinner, decided, onPick, thirdGroup}){
+  const clickable = !!code && !!onPick;
+  return (
+    <button disabled={!clickable} onClick={onPick}
+      className={'w-full flex items-center gap-2 px-3 py-2 text-left transition '
+        +(clickable?'hover:bg-neon/10 ':'')
+        +(decided&&isWinner?'bg-neon/15 ':'')
+        +(decided&&!isWinner?'opacity-40 ':'')}>
+      <Flag code={code} cls="text-lg" />
+      <span className="text-sm font-medium flex-1 truncate">{code?TEAMS[code].name:<span className="text-white/30 italic">TBD</span>}</span>
+      {thirdGroup && <Pill tone="muted">3rd {thirdGroup}</Pill>}
+      {decided&&isWinner && <span className="text-neon text-xs">✓</span>}
+    </button>
+  );
+}
+
+function MatchCard({m, teams, winnerOf, onPick}){
+  const t = teams[m.id]; const w = winnerOf(m.id);
+  return (
+    <div className="glass rounded-xl overflow-hidden divide-y divide-white/5 slidein">
+      <div className="flex items-center justify-between px-3 py-1 bg-black/20">
+        <span className="text-[10px] text-white/40 font-semibold">MATCH {m.id}</span>
+        {w && <span className="text-[10px] text-neon font-semibold pop">→ advances</span>}
+      </div>
+      <TeamRow code={t.home} thirdGroup={t.thirdGroup} isWinner={w===t.home} decided={!!w}
+        onPick={t.home?()=>onPick(m.id, t.home):null} />
+      <TeamRow code={t.away} isWinner={w===t.away} decided={!!w}
+        onPick={t.away?()=>onPick(m.id, t.away):null} />
+    </div>
+  );
+}
+
+function Knockout({resolved, onPick}){
+  const rounds = [
+    {key:'R32', list:R32},
+    ...['R16','QF','SF'].map(r=>({key:r, list:LATER.filter(m=>m.round===r)})),
+    {key:'BRONZE', list:LATER.filter(m=>m.round==='BRONZE')},
+    {key:'FINAL', list:LATER.filter(m=>m.round==='FINAL')},
+  ];
+  const [active, setActive] = useState('R32');
+  const counts = useMemo(()=>{
+    const c={}; rounds.forEach(r=>{ c[r.key]=r.list.filter(m=>resolved.winnerOf(m.id)).length; }); return c;
+  },[resolved]);
+  return (
+    <div>
+      <SectionHead title="Knockout Stage" sub="Tap a team to send them through. Winners advance automatically to the next round." />
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-1 px-1">
+        {rounds.map(r=>(
+          <button key={r.key} onClick={()=>setActive(r.key)}
+            className={'whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-semibold border transition '
+              +(active===r.key?'bg-neon text-pitch-950 border-neon':'bg-white/5 text-white/70 border-white/10 hover:border-neon/40')}>
+            {ROUND_META[r.key].label}
+            <span className={'ml-1.5 '+(active===r.key?'text-pitch-950/70':'text-white/40')}>{counts[r.key]}/{r.list.length}</span>
+          </button>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {rounds.find(r=>r.key===active).list.map(m=>(
+          <MatchCard key={m.id} m={m} teams={resolved.teams} winnerOf={resolved.winnerOf} onPick={onPick} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+function Podium({code, place}){
+  const meta = {1:{t:'CHAMPION',c:'gold',h:'h-44',z:'text-5xl'},2:{t:'RUNNER-UP',c:'#cbd5e1',h:'h-32',z:'text-4xl'},3:{t:'THIRD PLACE',c:'#cd7f32',h:'h-24',z:'text-4xl'}}[place];
+  return (
+    <div className="flex flex-col items-center justify-end">
+      <div className={'text-center mb-2 '+(code?'pop':'opacity-30')}>
+        <div className={meta.z}>{code?TEAMS[code].flag:'🏳️'}</div>
+        <div className="text-sm font-bold mt-1">{code?TEAMS[code].name:'—'}</div>
+      </div>
+      <div className={'w-24 sm:w-28 '+meta.h+' rounded-t-xl glass grid place-items-center'} style={{borderColor:meta.c+'66'}}>
+        <div className="text-center">
+          <div className="text-2xl font-black" style={{color:meta.c}}>{place}</div>
+          <div className="text-[9px] tracking-widest font-bold" style={{color:meta.c}}>{meta.t}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Results({resolved}){
+  const {champion, runnerUp, third} = resolved;
+  return (
+    <div className="text-center">
+      <SectionHead title="Final Results" sub="Your predicted podium for the FIFA World Cup 2026." />
+      {champion ? (
+        <div className="mb-8 slidein">
+          <div className="text-xs tracking-[0.3em] text-gold/80 font-bold mb-1">🏆 WORLD CHAMPIONS 🏆</div>
+          <div className="text-6xl my-3 pop">{TEAMS[champion].flag}</div>
+          <div className="text-3xl font-black trophy-shine">{TEAMS[champion].name}</div>
+        </div>
+      ) : (
+        <div className="glass rounded-2xl p-8 max-w-md mx-auto text-white/50">
+          Complete the Final to crown your champion.
+        </div>
+      )}
+      <div className="flex items-end justify-center gap-2 sm:gap-4 mt-6">
+        <Podium code={runnerUp} place={2} />
+        <Podium code={champion} place={1} />
+        <Podium code={third} place={3} />
+      </div>
+    </div>
+  );
+}
+
+/* shared section header */
+function SectionHead({title, sub}){
+  return (
+    <div className="mb-4">
+      <h2 className="text-xl sm:text-2xl font-black">{title}</h2>
+      {sub && <p className="text-sm text-white/50 mt-1 max-w-2xl">{sub}</p>}
+    </div>
+  );
+}
+
+/* ============================================================
+   SIMULATION & RANDOM
+   ============================================================ */
+function pickWeighted(a,b, sharp=1){
+  if(!a) return b; if(!b) return a;
+  const sa=Math.pow(STRENGTH(a),sharp), sb=Math.pow(STRENGTH(b),sharp);
+  return Math.random() < sa/(sa+sb) ? a : b;
+}
+function orderGroup(codes, mode){
+  // mode 'random' -> shuffle; 'sim' -> sort by strength + noise
+  if(mode==='random'){ const a=[...codes]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+  return [...codes].map(c=>[c, STRENGTH(c)+Math.random()*45]).sort((x,y)=>y[1]-x[1]).map(x=>x[0]);
+}
+function simulate(mode){
+  const st = defaultState();
+  GROUP_LETTERS.forEach(g=>{ st.standings[g]=orderGroup(GROUPS[g],mode); });
+  // rank thirds
+  const thirds = GROUP_LETTERS.map(g=>({g, s:STRENGTH(st.standings[g][2])+(mode==='random'?Math.random()*200:Math.random()*40)}));
+  st.thirdRanking = thirds.sort((a,b)=>b.s-a.s).map(x=>x.g);
+  // play out knockout deterministically in id order
+  const sharp = mode==='random'?0:6;
+  const allIds = [...R32.map(m=>m.id), ...LATER.map(m=>m.id)];
+  // resolve progressively: we need teams as we set picks
+  let res = resolveBracket(st);
+  allIds.forEach(id=>{
+    const t = res.teams[id];
+    if(t && (t.home||t.away)){
+      st.picks[id] = mode==='random' ? (Math.random()<0.5? (t.home||t.away):(t.away||t.home)) : pickWeighted(t.home,t.away,sharp);
+      res = resolveBracket(st);
+    }
+  });
+  return st;
+}
+
+/* ============================================================
+   APP
+   ============================================================ */
+const STEPS = [
+  {key:'groups', label:'Groups'},
+  {key:'thirds', label:'3rd Place'},
+  {key:'knockout', label:'Knockout'},
+  {key:'results', label:'Results'},
+];
+
+function App(){
+  const [state, setState] = useState(loadInitial);
+  const [step, setStep] = useState('groups');
+  const [toast, setToast] = useState(null);
+  const exportRef = useRef(null);
+
+  // persist
+  useEffect(()=>{ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }, [state]);
+
+  const resolved = useMemo(()=>resolveBracket(state), [state]);
+
+  const flash = msg => { setToast(msg); setTimeout(()=>setToast(null), 2200); };
+
+  const setStandings = (g, order)=> setState(s=>({...s, standings:{...s.standings, [g]:order}}));
+  const setThirdRanking = order => setState(s=>({...s, thirdRanking:order}));
+  const onPick = (id, code)=> setState(s=>{
+    const picks={...s.picks};
+    if(picks[id]===code) delete picks[id]; else picks[id]=code;
+    // clear downstream picks that depended on the changed match
+    const cleared = clearDownstream(id, {...s, picks});
+    return {...s, picks:cleared};
+  });
+
+  const doRandom = ()=>{ setState(simulate('random')); flash('🎲 Random bracket generated'); setStep('results'); };
+  const doSim = ()=>{ setState(simulate('sim')); flash('🤖 Simulated by FIFA ranking'); setStep('results'); };
+  const doReset = ()=>{ setState(defaultState()); flash('Reset'); setStep('groups'); };
+
+  const doShare = async ()=>{
+    const url = location.origin+location.pathname+'#s='+encodeState(state);
+    try{ await navigator.clipboard.writeText(url); flash('🔗 Share link copied to clipboard'); }
+    catch(e){ location.hash='s='+encodeState(state); flash('🔗 Share link in address bar'); }
+  };
+
+  const exportImage = async (asPdf)=>{
+    flash('Rendering image…');
+    const node = exportRef.current;
+    const canvas = await html2canvas(node, {backgroundColor:'#04150c', scale:2, useCORS:true});
+    if(asPdf){
+      const {jsPDF}=window.jspdf;
+      const img=canvas.toDataURL('image/png');
+      const pdf=new jsPDF({orientation:canvas.width>canvas.height?'l':'p', unit:'px', format:[canvas.width,canvas.height]});
+      pdf.addImage(img,'PNG',0,0,canvas.width,canvas.height);
+      pdf.save('wc2026-bracket.pdf'); flash('📄 PDF downloaded');
+    } else {
+      const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='wc2026-bracket.png'; a.click();
+      flash('🖼️ PNG downloaded');
+    }
+  };
+
+  return (
+    <div className="min-h-screen pitch-bg">
+      {/* HEADER */}
+      <header className="sticky top-0 z-30 backdrop-blur-md bg-pitch-950/70 border-b border-white/5">
+        <div className="spectrum-bar w-full" />
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2.5">
+            <Emblem />
+            <div>
+              <h1 className="font-black leading-none text-lg sm:text-xl spectrum-text tracking-tight">WORLD CUP 26</h1>
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="text-[10px] text-white/45 leading-none font-semibold">Bracket Predictor</span>
+                <span className="text-white/15">•</span>
+                <span className="text-xs leading-none" title="Canada · Mexico · USA">🇨🇦 🇲🇽 🇺🇸</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex-1" />
+          <div className="flex items-center gap-1.5 flex-wrap text-xs">
+            <ToolBtn onClick={doRandom}>🎲 Random</ToolBtn>
+            <ToolBtn onClick={doSim}>🤖 Simulate</ToolBtn>
+            <ToolBtn onClick={doShare}>🔗 Share</ToolBtn>
+            <ToolBtn onClick={()=>exportImage(false)}>🖼️ PNG</ToolBtn>
+            <ToolBtn onClick={()=>exportImage(true)}>📄 PDF</ToolBtn>
+            <ToolBtn onClick={doReset} danger>↺ Reset</ToolBtn>
+          </div>
+        </div>
+        {/* STEP NAV */}
+        <div className="max-w-6xl mx-auto px-4 pb-2 flex gap-1.5">
+          {STEPS.map((s,i)=>(
+            <button key={s.key} onClick={()=>setStep(s.key)}
+              className={'flex-1 py-2 rounded-lg text-xs font-bold border transition '
+                +(step===s.key?'bg-neon text-pitch-950 border-neon':'bg-white/5 text-white/60 border-white/10 hover:border-neon/40')}>
+              <span className="opacity-60 mr-1">{i+1}</span>{s.label}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      {/* BODY */}
+      <main ref={exportRef} className="max-w-6xl mx-auto px-4 py-6">
+        {step==='groups'   && <GroupStage state={state} setStandings={setStandings} />}
+        {step==='thirds'   && <ThirdPlace state={state} setThirdRanking={setThirdRanking} />}
+        {step==='knockout' && <Knockout resolved={resolved} onPick={onPick} />}
+        {step==='results'  && <Results resolved={resolved} />}
+      </main>
+
+      {/* FOOTER NAV */}
+      <div className="max-w-6xl mx-auto px-4 pb-6 flex justify-between">
+        <NavBtn dir="prev" step={step} setStep={setStep} />
+        <NavBtn dir="next" step={step} setStep={setStep} />
+      </div>
+      <footer className="max-w-6xl mx-auto px-4 pb-10 text-center">
+        <div className="spectrum-bar w-24 mx-auto rounded-full mb-3 opacity-60" />
+        <p className="text-[11px] text-white/35 leading-relaxed">
+          Unofficial fan-made predictor for the 2026 World Cup · Hosted by Canada, Mexico & the USA.<br/>
+          Not affiliated with, endorsed by, or sponsored by FIFA. All team names belong to their respective associations.
+        </p>
+      </footer>
+
+      {toast && <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 glass px-4 py-2 rounded-full text-sm font-semibold pop glow">{toast}</div>}
+    </div>
+  );
+}
+
+/* Original WC-2026-inspired trophy crest (not the official FIFA emblem) */
+function Emblem(){
+  return (
+    <svg width="40" height="40" viewBox="0 0 48 48" className="shrink-0">
+      <defs>
+        <linearGradient id="emg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ff2e88"/><stop offset=".4" stopColor="#a855f7"/>
+          <stop offset=".7" stopColor="#36a3ff"/><stop offset="1" stopColor="#2bd9c4"/>
+        </linearGradient>
+        <linearGradient id="emgold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffe27a"/><stop offset="1" stopColor="#ffb300"/>
+        </linearGradient>
+      </defs>
+      <circle cx="24" cy="24" r="22" fill="none" stroke="url(#emg)" strokeWidth="3"/>
+      {/* stylized trophy */}
+      <path d="M17 13h14v4c0 5-3 8-7 8s-7-3-7-8v-4z" fill="url(#emgold)"/>
+      <path d="M17 15c-3 0-4 1-4 3s2 3 4 3M31 15c3 0 4 1 4 3s-2 3-4 3" fill="none" stroke="url(#emgold)" strokeWidth="2" strokeLinecap="round"/>
+      <rect x="22" y="25" width="4" height="5" fill="url(#emgold)"/>
+      <rect x="18" y="30" width="12" height="3" rx="1.5" fill="url(#emgold)"/>
+      <text x="24" y="42" textAnchor="middle" fontSize="9" fontWeight="900" fill="#fff" fontFamily="Inter,sans-serif">26</text>
+    </svg>
+  );
+}
+function ToolBtn({children, onClick, danger}){
+  return <button onClick={onClick}
+    className={'px-2.5 py-1.5 rounded-lg font-semibold border transition '
+      +(danger?'border-red-500/30 text-red-300 hover:bg-red-500/10':'border-white/10 text-white/80 hover:border-neon/50 hover:text-neon')}>
+    {children}</button>;
+}
+function NavBtn({dir, step, setStep}){
+  const i = STEPS.findIndex(s=>s.key===step);
+  const tgt = dir==='next'?STEPS[i+1]:STEPS[i-1];
+  if(!tgt) return <span/>;
+  return <button onClick={()=>{setStep(tgt.key); window.scrollTo({top:0,behavior:'smooth'});}}
+    className="px-4 py-2 rounded-xl glass font-semibold text-sm hover:border-neon/50 transition">
+    {dir==='prev'?'← '+tgt.label : tgt.label+' →'}</button>;
+}
+
+/* clear picks downstream of a changed match so the bracket stays consistent */
+function clearDownstream(changedId, state){
+  const picks = {...state.picks};
+  // map: matchId -> matches that consume its winner/loser
+  const consumers = {};
+  LATER.forEach(m=>{
+    [m.a,m.b].forEach(r=>{ const src=r.w!==undefined?r.w:r.l; (consumers[src]=consumers[src]||[]).push(m.id); });
+  });
+  const stack=[changedId];
+  const visited=new Set();
+  while(stack.length){
+    const id=stack.pop();
+    (consumers[id]||[]).forEach(cid=>{
+      if(!visited.has(cid)){ visited.add(cid); delete picks[cid]; stack.push(cid); }
+    });
+  }
+  return picks;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
