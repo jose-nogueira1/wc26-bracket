@@ -9,9 +9,12 @@ match — visualised as a real bracket tree — from the Round of 32 all the way
 
 ## Features
 - **Gated, step-by-step flow** — finish the groups to unlock 3rd-place ranking, then the knockout, then results. Locked steps show a 🔒.
-- **Group stage** — drag to set 1st–4th in each of the 12 groups (A–L)
+- **Group stage** — drag to set 1st–4th in each of the 12 groups (A–L), or hit "✎ Scores" to enter the 6 results and have the table + qualifying order compute automatically (FIFA tiebreakers: points → GD → GF → head-to-head)
 - **Third-place ranking** — drag-and-drop the 12 third-placed teams; top 8 qualify
 - **Visual bracket** — a true left-to-right bracket tree with connector lines converging to a centered Final (plus a List view for easy tapping on mobile)
+- **Title odds (Monte Carlo)** — "📊 Odds" runs 4,000 FIFA-rank-weighted simulations and shows each team's % chance to reach each round and win the cup
+- **Favourite team + themes** — pick a favourite (highlighted gold across groups, ranking, bracket and results) and switch between Spectrum / Ocean / Sunset colour themes
+- **Mobile drag-and-drop** — reordering uses Pointer Events, so it works with touch as well as a mouse
 - **Config-driven engine** — official R32 mapping from the FWC26 match schedule, with constraint-based third-place slot assignment (verified across all 495 qualification combinations)
 - **Animated podium** — champion, runner-up, third place
 - **Bracket-style export** — PNG / PDF with the 12 group standings on each side and the bracket in the middle (unlocks once the whole bracket, including the 3rd-place match, is complete)

@@ -53,17 +53,18 @@
 </script>
 <style>
   html,body{background:#0a0a16;color:#eef0ff;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  *{scrollbar-width:thin;scrollbar-color:#ff2e88 #14142b}
+  :root{--c1:#ff2e88;--c2:#a855f7;--c3:#36a3ff;--c4:#2bd9c4;--c5:#ffd23f;--g1:255,46,136;--g2:54,163,255;--g3:168,85,247}
+  *{scrollbar-width:thin;scrollbar-color:var(--c1) #14142b}
   ::-webkit-scrollbar{height:8px;width:8px}
-  ::-webkit-scrollbar-thumb{background:linear-gradient(#ff2e88,#a855f7);border-radius:8px}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(var(--c1),var(--c2));border-radius:8px}
   .glass{background:rgba(22,22,46,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.10)}
-  .spectrum{background:linear-gradient(90deg,#ff2e88,#a855f7,#36a3ff,#2bd9c4,#ffd23f)}
-  .spectrum-text{background:linear-gradient(90deg,#ff2e88,#a855f7,#36a3ff,#2bd9c4);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .spectrum-bar{height:4px;background:linear-gradient(90deg,#ff2e88,#a855f7,#36a3ff,#2bd9c4,#ffd23f)}
+  .spectrum{background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5))}
+  .spectrum-text{background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c4));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .spectrum-bar{height:4px;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5))}
   .pitch-bg{background:
-     radial-gradient(900px 420px at 8% -8%, rgba(255,46,136,.20), transparent 60%),
-     radial-gradient(900px 420px at 92% -6%, rgba(54,163,255,.18), transparent 60%),
-     radial-gradient(1100px 600px at 50% 110%, rgba(168,85,247,.16), transparent 60%),
+     radial-gradient(900px 420px at 8% -8%, rgba(var(--g1),.20), transparent 60%),
+     radial-gradient(900px 420px at 92% -6%, rgba(var(--g2),.18), transparent 60%),
+     radial-gradient(1100px 600px at 50% 110%, rgba(var(--g3),.16), transparent 60%),
      repeating-linear-gradient(180deg,#0a0a16 0px,#0a0a16 38px,#0e0e20 38px,#0e0e20 76px)}
   @keyframes pop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
   .pop{animation:pop .32s cubic-bezier(.2,.8,.2,1)}
@@ -72,7 +73,8 @@
   @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(34,227,107,.0)}50%{box-shadow:0 0 28px 2px rgba(34,227,107,.35)}}
   .glow{animation:glow 2.2s ease-in-out infinite}
   .drag-over{outline:2px dashed #22e36b;outline-offset:2px}
-  .dragging{opacity:.4}
+  .dragging{transform:scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,.45);position:relative;z-index:10;opacity:.95}
+  .dragging *{cursor:grabbing!important}
   @keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
   .trophy-shine{background:linear-gradient(110deg,#f5c518 25%,#fff6c2 50%,#f5c518 75%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite}
   /* bracket */
@@ -137,6 +139,164 @@ const GROUPS = {
   K:['POR','COD','UZB','COL'], L:['ENG','CRO','GHA','PAN'],
 };
 const GROUP_LETTERS = Object.keys(GROUPS);
+
+/* ============================================================
+   i18n — EN / PT / FR / ES   (UI strings; country names kept standard)
+   ============================================================ */
+let LANG = 'en';
+const LANGS = [['en','EN'],['pt','PT'],['fr','FR'],['es','ES']];
+const I18N = {
+  en:{
+    brandSub:'Bracket Predictor',
+    btnRandom:'Random', btnSim:'Simulate', btnOdds:'Odds', btnShare:'Share', btnReset:'Reset',
+    favourite:'Favourite', none:'— none —', theme:'Theme', language:'Language',
+    stepGroups:'Groups', stepThirds:'3rd Place', stepKnockout:'Knockout', stepResults:'Results',
+    lockedStep:'🔒 Complete the previous step first',
+    toastRandom:'🎲 Random bracket generated', toastSim:'🤖 Simulated by FIFA ranking', toastReset:'Reset',
+    toastShareCopied:'🔗 Share link copied to clipboard', toastShareBar:'🔗 Share link in address bar',
+    toastExportLock:'🔒 Finish your bracket to unlock export', toastRendering:'Rendering your bracket…',
+    toastPdf:'📄 PDF downloaded', toastPng:'🖼️ PNG downloaded', toastExportFail:'Export failed — try again',
+    groupTitle:'Group Stage',
+    groupSub:'Drag teams to set each group’s order — or hit “✎ Scores” to enter the 6 results and let the table and qualifying order compute automatically (FIFA tiebreakers). Top 2 qualify; 3rd enters the ranking.',
+    groupWord:'GROUP', scores:'Scores', editScores:'Edit scores', done:'Done',
+    enterScores:'Enter scorelines — standings update automatically', clearScores:'Clear group scores',
+    qual:'QUAL', third:'3rd',
+    thirdsTitle:'Best Third-Placed Teams',
+    thirdsSub:'Rank all 12 third-placed teams. The top 8 qualify for the Round of 32; the bottom 4 are eliminated.',
+    groupOf:'Group {g}', qualifies:'QUALIFIES', eliminated:'ELIMINATED',
+    knockoutTitle:'Knockout Bracket',
+    knockoutSub:'Tap a team to advance them. Winners flow through automatically. {done}/{total} picked.',
+    viewBracket:'Bracket', viewList:'List',
+    bracketHint:'Drag horizontally if it overflows · switch to List view for easier tapping on mobile.',
+    roundR32:'Round of 32', roundR16:'Round of 16', roundQF:'Quarter-finals', roundSF:'Semi-finals', roundBRONZE:'Third Place Match', roundFINAL:'Final',
+    match:'MATCH', advances:'→ advances', tbd:'TBD', finalLabel:'FINAL', thirdPlaceLabel:'3RD PLACE',
+    resultsTitle:'Final Results', resultsSub:'Your predicted podium for the FIFA World Cup 2026.',
+    worldChampions:'🏆 WORLD CHAMPIONS 🏆', completeFinal:'Complete the Final to crown your champion.',
+    champion:'CHAMPION', runnerUp:'RUNNER-UP', thirdPlace:'THIRD PLACE',
+    yourFav:'Your favourite', favWon:'🏆 won the World Cup!', favRunner:'🥈 finished runner-up', favThird:'🥉 finished third', favNone:'didn’t reach the podium in your bracket',
+    contTo:'Continue to {x} →', viewResults:'View Results →', pickFinal:'🔒 Pick the Final first', exportHint:'Export your bracket with 🖼️ PNG / 📄 PDF above',
+    oddsTitle:'📊 Title Odds', oddsSub:'Monte Carlo · 4,000 simulations weighted by FIFA ranking', oddsRunning:'Running 4,000 simulations…',
+    colTeam:'Team', colWin:'Win', colFinal:'Final', colSF:'SF', colQF:'QF', colR16:'R16',
+    oddsNote:'Probabilities are model estimates from FIFA-ranking-weighted random simulations, independent of your bracket.',
+    footer1:'Unofficial fan-made predictor for the 2026 World Cup · Hosted by Canada, Mexico & the USA.',
+    footer2:'Not affiliated with, endorsed by, or sponsored by FIFA. All team names belong to their respective associations.',
+    exportTitle:'WORLD CUP 26 — MY BRACKET', exportSub:'Predicted knockout bracket', exportChamp:'🏆 CHAMPION', exportFooter:'Unofficial fan-made predictor · Not affiliated with FIFA · Generated with the WC26 Bracket Predictor',
+  },
+  pt:{
+    brandSub:'Simulador de Chaves',
+    btnRandom:'Aleatório', btnSim:'Simular', btnOdds:'Chances', btnShare:'Partilhar', btnReset:'Repor',
+    favourite:'Favorita', none:'— nenhuma —', theme:'Tema', language:'Idioma',
+    stepGroups:'Grupos', stepThirds:'3.º Lugar', stepKnockout:'Mata-Mata', stepResults:'Resultados',
+    lockedStep:'🔒 Conclua a etapa anterior primeiro',
+    toastRandom:'🎲 Chave aleatória gerada', toastSim:'🤖 Simulado pelo ranking FIFA', toastReset:'Reposto',
+    toastShareCopied:'🔗 Link copiado para a área de transferência', toastShareBar:'🔗 Link de partilha na barra de endereço',
+    toastExportLock:'🔒 Complete a sua chave para exportar', toastRendering:'A gerar a sua chave…',
+    toastPdf:'📄 PDF descarregado', toastPng:'🖼️ PNG descarregado', toastExportFail:'Falha ao exportar — tente novamente',
+    groupTitle:'Fase de Grupos',
+    groupSub:'Arraste as equipas para ordenar cada grupo — ou toque em “✎ Resultados” para inserir os 6 jogos e deixar a tabela e a ordem de apuramento calcularem-se automaticamente (critérios de desempate FIFA). Os 2 primeiros apuram-se; o 3.º entra no ranking.',
+    groupWord:'GRUPO', scores:'Resultados', editScores:'Editar resultados', done:'Concluído',
+    enterScores:'Insira os resultados — a tabela atualiza automaticamente', clearScores:'Limpar resultados do grupo',
+    qual:'APUR', third:'3.º',
+    thirdsTitle:'Melhores Terceiros Classificados',
+    thirdsSub:'Ordene os 12 terceiros classificados. Os 8 melhores apuram-se para os 16 avos; os 4 últimos são eliminados.',
+    groupOf:'Grupo {g}', qualifies:'APURA-SE', eliminated:'ELIMINADO',
+    knockoutTitle:'Quadro Eliminatório',
+    knockoutSub:'Toque numa equipa para a fazer avançar. Os vencedores avançam automaticamente. {done}/{total} escolhidos.',
+    viewBracket:'Quadro', viewList:'Lista',
+    bracketHint:'Arraste na horizontal se transbordar · use a vista de Lista para tocar mais facilmente no telemóvel.',
+    roundR32:'16 avos de final', roundR16:'Oitavos de final', roundQF:'Quartos de final', roundSF:'Meias-finais', roundBRONZE:'Disputa do 3.º Lugar', roundFINAL:'Final',
+    match:'JOGO', advances:'→ avança', tbd:'A definir', finalLabel:'FINAL', thirdPlaceLabel:'3.º LUGAR',
+    resultsTitle:'Resultado Final', resultsSub:'O seu pódio previsto para o Mundial 2026.',
+    worldChampions:'🏆 CAMPEÕES DO MUNDO 🏆', completeFinal:'Complete a Final para coroar o seu campeão.',
+    champion:'CAMPEÃO', runnerUp:'VICE', thirdPlace:'3.º LUGAR',
+    yourFav:'A sua favorita', favWon:'🏆 venceu o Mundial!', favRunner:'🥈 ficou em segundo', favThird:'🥉 ficou em terceiro', favNone:'não chegou ao pódio na sua chave',
+    contTo:'Continuar para {x} →', viewResults:'Ver Resultados →', pickFinal:'🔒 Escolha a Final primeiro', exportHint:'Exporte a sua chave com 🖼️ PNG / 📄 PDF acima',
+    oddsTitle:'📊 Probabilidades do Título', oddsSub:'Monte Carlo · 4.000 simulações ponderadas pelo ranking FIFA', oddsRunning:'A correr 4.000 simulações…',
+    colTeam:'Equipa', colWin:'Título', colFinal:'Final', colSF:'MF', colQF:'QF', colR16:'8.os',
+    oddsNote:'As probabilidades são estimativas de simulações aleatórias ponderadas pelo ranking FIFA, independentes da sua chave.',
+    footer1:'Simulador não oficial feito por fãs para o Mundial 2026 · Organizado por Canadá, México e EUA.',
+    footer2:'Sem qualquer afiliação, apoio ou patrocínio da FIFA. Os nomes das equipas pertencem às respetivas associações.',
+    exportTitle:'MUNDIAL 26 — A MINHA CHAVE', exportSub:'Quadro eliminatório previsto', exportChamp:'🏆 CAMPEÃO', exportFooter:'Simulador não oficial feito por fãs · Sem afiliação à FIFA · Gerado com o WC26 Bracket Predictor',
+  },
+  fr:{
+    brandSub:'Pronostics du tableau',
+    btnRandom:'Aléatoire', btnSim:'Simuler', btnOdds:'Cotes', btnShare:'Partager', btnReset:'Réinit.',
+    favourite:'Favorite', none:'— aucune —', theme:'Thème', language:'Langue',
+    stepGroups:'Groupes', stepThirds:'3e Place', stepKnockout:'Élimination', stepResults:'Résultats',
+    lockedStep:'🔒 Terminez d’abord l’étape précédente',
+    toastRandom:'🎲 Tableau aléatoire généré', toastSim:'🤖 Simulé selon le classement FIFA', toastReset:'Réinitialisé',
+    toastShareCopied:'🔗 Lien copié dans le presse-papiers', toastShareBar:'🔗 Lien de partage dans la barre d’adresse',
+    toastExportLock:'🔒 Terminez votre tableau pour exporter', toastRendering:'Génération de votre tableau…',
+    toastPdf:'📄 PDF téléchargé', toastPng:'🖼️ PNG téléchargé', toastExportFail:'Échec de l’export — réessayez',
+    groupTitle:'Phase de Groupes',
+    groupSub:'Glissez les équipes pour ordonner chaque groupe — ou appuyez sur « ✎ Scores » pour saisir les 6 matchs et laisser le classement et l’ordre de qualification se calculer automatiquement (départages FIFA). Les 2 premiers se qualifient ; le 3e entre dans le classement.',
+    groupWord:'GROUPE', scores:'Scores', editScores:'Modifier', done:'Terminé',
+    enterScores:'Saisissez les scores — le classement se met à jour automatiquement', clearScores:'Effacer les scores du groupe',
+    qual:'QUAL', third:'3e',
+    thirdsTitle:'Meilleurs Troisièmes',
+    thirdsSub:'Classez les 12 équipes troisièmes. Les 8 meilleures se qualifient pour les 16es ; les 4 dernières sont éliminées.',
+    groupOf:'Groupe {g}', qualifies:'QUALIFIÉE', eliminated:'ÉLIMINÉE',
+    knockoutTitle:'Tableau Final',
+    knockoutSub:'Touchez une équipe pour la faire avancer. Les vainqueurs avancent automatiquement. {done}/{total} choisis.',
+    viewBracket:'Tableau', viewList:'Liste',
+    bracketHint:'Faites défiler horizontalement si nécessaire · utilisez la vue Liste pour toucher plus facilement sur mobile.',
+    roundR32:'16es de finale', roundR16:'8es de finale', roundQF:'Quarts de finale', roundSF:'Demi-finales', roundBRONZE:'Match pour la 3e place', roundFINAL:'Finale',
+    match:'MATCH', advances:'→ qualifié', tbd:'À définir', finalLabel:'FINALE', thirdPlaceLabel:'3E PLACE',
+    resultsTitle:'Résultats Finaux', resultsSub:'Votre podium prédit pour la Coupe du Monde 2026.',
+    worldChampions:'🏆 CHAMPIONS DU MONDE 🏆', completeFinal:'Terminez la finale pour couronner votre champion.',
+    champion:'CHAMPION', runnerUp:'FINALISTE', thirdPlace:'3E PLACE',
+    yourFav:'Votre favorite', favWon:'🏆 a gagné la Coupe du Monde !', favRunner:'🥈 termine finaliste', favThird:'🥉 termine troisième', favNone:'n’a pas atteint le podium dans votre tableau',
+    contTo:'Continuer vers {x} →', viewResults:'Voir les Résultats →', pickFinal:'🔒 Choisissez d’abord la finale', exportHint:'Exportez votre tableau avec 🖼️ PNG / 📄 PDF ci-dessus',
+    oddsTitle:'📊 Cotes du Titre', oddsSub:'Monte-Carlo · 4 000 simulations pondérées par le classement FIFA', oddsRunning:'4 000 simulations en cours…',
+    colTeam:'Équipe', colWin:'Titre', colFinal:'Finale', colSF:'DF', colQF:'QF', colR16:'8es',
+    oddsNote:'Les probabilités sont des estimations issues de simulations aléatoires pondérées par le classement FIFA, indépendantes de votre tableau.',
+    footer1:'Pronostiqueur non officiel créé par des fans pour la Coupe du Monde 2026 · Organisée par le Canada, le Mexique et les États-Unis.',
+    footer2:'Sans affiliation, approbation ni parrainage de la FIFA. Les noms des équipes appartiennent à leurs associations respectives.',
+    exportTitle:'COUPE DU MONDE 26 — MON TABLEAU', exportSub:'Tableau final prédit', exportChamp:'🏆 CHAMPION', exportFooter:'Pronostiqueur non officiel créé par des fans · Sans affiliation à la FIFA · Généré avec WC26 Bracket Predictor',
+  },
+  es:{
+    brandSub:'Predictor de llaves',
+    btnRandom:'Aleatorio', btnSim:'Simular', btnOdds:'Cuotas', btnShare:'Compartir', btnReset:'Reiniciar',
+    favourite:'Favorita', none:'— ninguna —', theme:'Tema', language:'Idioma',
+    stepGroups:'Grupos', stepThirds:'3.º Puesto', stepKnockout:'Eliminatorias', stepResults:'Resultados',
+    lockedStep:'🔒 Completa primero el paso anterior',
+    toastRandom:'🎲 Cuadro aleatorio generado', toastSim:'🤖 Simulado por el ranking FIFA', toastReset:'Reiniciado',
+    toastShareCopied:'🔗 Enlace copiado al portapapeles', toastShareBar:'🔗 Enlace para compartir en la barra de direcciones',
+    toastExportLock:'🔒 Completa tu cuadro para exportar', toastRendering:'Generando tu cuadro…',
+    toastPdf:'📄 PDF descargado', toastPng:'🖼️ PNG descargado', toastExportFail:'Error al exportar — inténtalo de nuevo',
+    groupTitle:'Fase de Grupos',
+    groupSub:'Arrastra los equipos para ordenar cada grupo — o pulsa “✎ Resultados” para introducir los 6 partidos y dejar que la tabla y el orden de clasificación se calculen automáticamente (criterios de desempate FIFA). Los 2 primeros clasifican; el 3.º entra en el ranking.',
+    groupWord:'GRUPO', scores:'Resultados', editScores:'Editar resultados', done:'Listo',
+    enterScores:'Introduce los resultados — la tabla se actualiza automáticamente', clearScores:'Borrar resultados del grupo',
+    qual:'CLAS', third:'3.º',
+    thirdsTitle:'Mejores Terceros',
+    thirdsSub:'Ordena los 12 terceros clasificados. Los 8 mejores clasifican a los dieciseisavos; los 4 últimos quedan eliminados.',
+    groupOf:'Grupo {g}', qualifies:'CLASIFICA', eliminated:'ELIMINADO',
+    knockoutTitle:'Cuadro Eliminatorio',
+    knockoutSub:'Pulsa un equipo para hacerlo avanzar. Los ganadores avanzan automáticamente. {done}/{total} elegidos.',
+    viewBracket:'Cuadro', viewList:'Lista',
+    bracketHint:'Desplázate en horizontal si se sale · usa la vista de Lista para tocar más fácil en el móvil.',
+    roundR32:'Dieciseisavos', roundR16:'Octavos de final', roundQF:'Cuartos de final', roundSF:'Semifinales', roundBRONZE:'Partido por el 3.º Puesto', roundFINAL:'Final',
+    match:'PARTIDO', advances:'→ avanza', tbd:'Por definir', finalLabel:'FINAL', thirdPlaceLabel:'3.º PUESTO',
+    resultsTitle:'Resultado Final', resultsSub:'Tu podio previsto para el Mundial 2026.',
+    worldChampions:'🏆 CAMPEONES DEL MUNDO 🏆', completeFinal:'Completa la Final para coronar a tu campeón.',
+    champion:'CAMPEÓN', runnerUp:'SUBCAMPEÓN', thirdPlace:'3.º PUESTO',
+    yourFav:'Tu favorita', favWon:'🏆 ¡ganó el Mundial!', favRunner:'🥈 quedó subcampeona', favThird:'🥉 quedó tercera', favNone:'no llegó al podio en tu cuadro',
+    contTo:'Continuar a {x} →', viewResults:'Ver Resultados →', pickFinal:'🔒 Elige primero la Final', exportHint:'Exporta tu cuadro con 🖼️ PNG / 📄 PDF arriba',
+    oddsTitle:'📊 Cuotas del Título', oddsSub:'Monte Carlo · 4.000 simulaciones ponderadas por el ranking FIFA', oddsRunning:'Ejecutando 4.000 simulaciones…',
+    colTeam:'Equipo', colWin:'Título', colFinal:'Final', colSF:'SF', colQF:'CF', colR16:'8.os',
+    oddsNote:'Las probabilidades son estimaciones de simulaciones aleatorias ponderadas por el ranking FIFA, independientes de tu cuadro.',
+    footer1:'Predictor no oficial hecho por aficionados para el Mundial 2026 · Organizado por Canadá, México y EE. UU.',
+    footer2:'Sin afiliación, respaldo ni patrocinio de la FIFA. Los nombres de los equipos pertenecen a sus respectivas asociaciones.',
+    exportTitle:'MUNDIAL 26 — MI CUADRO', exportSub:'Cuadro eliminatorio previsto', exportChamp:'🏆 CAMPEÓN', exportFooter:'Predictor no oficial hecho por aficionados · Sin afiliación a la FIFA · Generado con WC26 Bracket Predictor',
+  },
+};
+function tr(key, vars){
+  let s = (I18N[LANG] && I18N[LANG][key]) ?? I18N.en[key] ?? key;
+  if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  return s;
+}
+const roundLabel = key => tr('round'+key);
 
 // Round of 32 — sources: {t:'w'|'ru', g:Group}  or  {t:'3', combo:'eligible groups'}
 const R32 = [
@@ -250,11 +410,27 @@ const ALL_ROUND_IDS = { R32:R32.map(m=>m.id), ...LATER.reduce((a,m)=>{(a[m.round
    STATE  (persistence + URL share)
    ============================================================ */
 const STORAGE_KEY = 'wc2026-bracket-v1';
+
+// Round-robin fixtures for a group of 4 (indexes into the group's seeded array)
+const GROUP_FIXTURES = [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]];
+
+// Colour themes — swap the World Cup "spectrum" + background mood
+const THEMES = {
+  magenta:{ label:'Spectrum', c:['#ff2e88','#a855f7','#36a3ff','#2bd9c4','#ffd23f'], glow:['255,46,136','54,163,255','168,85,247'] },
+  ocean:  { label:'Ocean',    c:['#22d3ee','#38bdf8','#6366f1','#2dd4bf','#a3e635'], glow:['56,189,248','45,212,191','99,102,241'] },
+  sunset: { label:'Sunset',   c:['#fb7185','#fb923c','#f59e0b','#ef4444','#a855f7'], glow:['251,113,133','251,146,60','168,85,247'] },
+};
+
 const defaultState = () => ({
   standings: Object.fromEntries(GROUP_LETTERS.map(g=>[g,[...GROUPS[g]]])),
   thirdRanking: [...GROUP_LETTERS],        // ranking of the 12 groups' third teams
   picks: {},                               // matchId -> winning team code
+  groupScores: {},                         // group -> fixtureIndex -> {h,a}
+  favorite: null,                          // favourite team code
+  theme: 'magenta',
+  lang: 'en',
 });
+const normalize = s => ({ groupScores:{}, favorite:null, theme:'magenta', lang:'en', ...s });
 
 function encodeState(s){
   try { return btoa(unescape(encodeURIComponent(JSON.stringify(s)))); } catch(e){ return ''; }
@@ -266,27 +442,96 @@ function decodeState(str){
 }
 function loadInitial(){
   const hash = location.hash.replace(/^#/,'');
-  if(hash.startsWith('s=')){ const d = decodeState(hash.slice(2)); if(d) return d; }
-  try { const raw = localStorage.getItem(STORAGE_KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.standings) return d; } } catch(e){}
+  if(hash.startsWith('s=')){ const d = decodeState(hash.slice(2)); if(d) return normalize(d); }
+  try { const raw = localStorage.getItem(STORAGE_KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.standings) return normalize(d); } } catch(e){}
   return defaultState();
+}
+
+/* compute a group's standings table + order from entered scorelines.
+   Returns {rows:[{code,P,W,D,L,GF,GA,GD,Pts}], order:[codes]} — FIFA tiebreakers
+   (points, GD, GF, then head-to-head points among tied teams, then seeding). */
+function computeGroup(letter, seededOrder, scores){
+  const teams = GROUPS[letter];
+  const st = Object.fromEntries(teams.map(c=>[c,{code:c,P:0,W:0,D:0,L:0,GF:0,GA:0,Pts:0}]));
+  const h2h = {}; teams.forEach(a=>h2h[a]={});
+  let any=false;
+  GROUP_FIXTURES.forEach((fx,i)=>{
+    const sc = scores && scores[i];
+    if(!sc || sc.h==null || sc.a==null) return;
+    any=true;
+    const A=teams[fx[0]], B=teams[fx[1]], ga=sc.h, gb=sc.a;
+    st[A].P++; st[B].P++; st[A].GF+=ga; st[A].GA+=gb; st[B].GF+=gb; st[B].GA+=ga;
+    if(ga>gb){ st[A].W++; st[A].Pts+=3; st[B].L++; h2h[A][B]=(h2h[A][B]||0)+3; }
+    else if(gb>ga){ st[B].W++; st[B].Pts+=3; st[A].L++; h2h[B][A]=(h2h[B][A]||0)+3; }
+    else { st[A].D++; st[B].D++; st[A].Pts++; st[B].Pts++; h2h[A][B]=(h2h[A][B]||0)+1; h2h[B][A]=(h2h[B][A]||0)+1; }
+  });
+  const seedIdx = c => seededOrder.indexOf(c);
+  const order = [...teams].sort((a,b)=>{
+    const A=st[a], B=st[b];
+    if(B.Pts!==A.Pts) return B.Pts-A.Pts;
+    if((B.GF-B.GA)!==(A.GF-A.GA)) return (B.GF-B.GA)-(A.GF-A.GA);
+    if(B.GF!==A.GF) return B.GF-A.GF;
+    const hb=(h2h[b][a]||0), ha=(h2h[a][b]||0); if(hb!==ha) return hb-ha;
+    return seedIdx(a)-seedIdx(b);
+  });
+  const rows = order.map(c=>{const s=st[c]; return {...s, GD:s.GF-s.GA};});
+  return { rows, order, played:any };
 }
 
 /* ============================================================
    GENERIC DRAG-AND-DROP REORDER LIST
    ============================================================ */
+/* Pointer-based reorder — works with mouse, touch and pen (HTML5 DnD has no
+   touch support, so mobile drag-and-drop needs Pointer Events). */
 function ReorderList({items, onReorder, renderItem}){
-  const [dragIdx, setDragIdx] = useState(null);
-  const [overIdx, setOverIdx] = useState(null);
-  const move = (from,to)=>{ if(from===to||from==null||to==null)return;
-    const arr=[...items]; const [m]=arr.splice(from,1); arr.splice(to,0,m); onReorder(arr); };
-  return items.map((it,i)=>(
+  const [order, setOrder] = useState(()=>items.map(i=>i.key));
+  const [dragKey, setDragKey] = useState(null);
+  const drag = useRef({active:false});
+
+  // keep local order in sync with parent when we're not mid-drag
+  useEffect(()=>{ if(!drag.current.active) setOrder(items.map(i=>i.key)); }, [items]);
+
+  const byKey = {}; items.forEach(it=>byKey[it.key]=it);
+  const ordered = order.map(k=>byKey[k]).filter(Boolean);
+
+  const start = (e, key)=>{
+    if(e.pointerType==='mouse' && e.button!==0) return;
+    drag.current = {active:true, key, container:e.currentTarget.parentElement};
+    setDragKey(key);
+    try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(_){}
+  };
+  const move = (e)=>{
+    if(!drag.current.active) return;
+    e.preventDefault();
+    const kids = [...drag.current.container.children];
+    const y = e.clientY;
+    let target = kids.length-1;
+    for(let i=0;i<kids.length;i++){
+      const r = kids[i].getBoundingClientRect();
+      if(y < r.top + r.height/2){ target = i; break; }
+    }
+    setOrder(prev=>{
+      const from = prev.indexOf(drag.current.key);
+      if(from<0 || from===target) return prev;
+      const next=[...prev]; next.splice(from,1); next.splice(target,0,drag.current.key);
+      return next;
+    });
+  };
+  const end = ()=>{
+    if(!drag.current.active) return;
+    drag.current.active=false;
+    setDragKey(null);
+    setOrder(prev=>{ onReorder(prev.map(k=>byKey[k]).filter(Boolean)); return prev; });
+  };
+
+  return ordered.map((it,i)=>(
     <div key={it.key}
-      draggable
-      onDragStart={e=>{setDragIdx(i); e.dataTransfer.effectAllowed='move';}}
-      onDragEnd={()=>{setDragIdx(null);setOverIdx(null);}}
-      onDragOver={e=>{e.preventDefault(); setOverIdx(i);}}
-      onDrop={e=>{e.preventDefault(); move(dragIdx,i); setDragIdx(null);setOverIdx(null);}}
-      className={(dragIdx===i?'dragging ':'')+(overIdx===i&&dragIdx!==i?'drag-over ':'')+'select-none'}>
+      onPointerDown={e=>start(e,it.key)}
+      onPointerMove={move}
+      onPointerUp={end}
+      onPointerCancel={end}
+      style={{touchAction:'none', userSelect:'none', WebkitUserSelect:'none'}}
+      className={(dragKey===it.key?'dragging ':'')+'select-none'}>
       {renderItem(it, i)}
     </div>
   ));
@@ -302,45 +547,95 @@ const Pill = ({children,tone='neon'}) => {
 /* ============================================================
    GROUP STAGE
    ============================================================ */
-function GroupCard({letter, order, onReorder}){
-  const items = order.map((code,i)=>({key:code, code, pos:i}));
+function GroupCard({letter, order, scores, played, computed, onReorder, onScore, onClear, favorite}){
+  const [edit,setEdit]=useState(false);
+  const teams=GROUPS[letter];
+  const fav = code => favorite===code;
   return (
     <div className="glass rounded-2xl p-3 slidein">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="font-bold text-sm tracking-wide">GROUP {letter}</h3>
-        <Pill tone="muted">drag to rank</Pill>
+        <h3 className="font-bold text-sm tracking-wide">{tr('groupWord')} {letter}</h3>
+        <button onClick={()=>setEdit(v=>!v)} className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-white/10 text-white/55 hover:text-neon hover:border-neon/40 transition">
+          {edit?tr('done'):'✎ '+(played?tr('editScores'):tr('scores'))}
+        </button>
       </div>
-      <div className="space-y-1.5">
-        <ReorderList items={items} onReorder={arr=>onReorder(letter, arr.map(x=>x.code))}
-          renderItem={(it)=>{
-            const qual = it.pos<2, third = it.pos===2;
+
+      {played ? (
+        <div className="space-y-1">
+          {computed.rows.map((r,i)=>{
+            const qual=i<2,third=i===2;
             return (
-              <div className={'flex items-center gap-2 rounded-xl px-2.5 py-2 cursor-grab active:cursor-grabbing border transition '
-                +(qual?'bg-neon/10 border-neon/30':third?'bg-amber-400/10 border-amber-400/25':'bg-white/[.03] border-white/5')}>
-                <span className={'w-5 h-5 grid place-items-center rounded-md text-[11px] font-bold '
-                  +(qual?'bg-neon text-pitch-950':third?'bg-amber-400 text-pitch-950':'bg-white/10 text-white/50')}>{it.pos+1}</span>
-                <Flag code={it.code} cls="text-lg" />
-                <span className="text-sm font-medium truncate flex-1">{TEAMS[it.code].name}</span>
-                {qual && <Pill>QUAL</Pill>}
-                {third && <Pill tone="muted">3rd</Pill>}
-                <span className="text-white/20 text-xs">⠿</span>
+              <div key={r.code} className={'flex items-center gap-2 rounded-lg px-2 py-1.5 border '
+                +(qual?'bg-neon/10 border-neon/30':third?'bg-amber-400/10 border-amber-400/25':'bg-white/[.03] border-white/5')+(fav(r.code)?' ring-1 ring-gold/70':'')}>
+                <span className={'w-5 h-5 grid place-items-center rounded-md text-[11px] font-bold '+(qual?'bg-neon text-pitch-950':third?'bg-amber-400 text-pitch-950':'bg-white/10 text-white/50')}>{i+1}</span>
+                <Flag code={r.code} cls="text-base" />
+                <span className="text-sm font-medium truncate flex-1">{TEAMS[r.code].name}{fav(r.code)&&<span className="text-gold"> ★</span>}</span>
+                <span className="text-[10px] text-white/40 tabular-nums">{r.W}-{r.D}-{r.L}</span>
+                <span className="text-[10px] text-white/35 w-7 text-right tabular-nums">{r.GD>0?'+'+r.GD:r.GD}</span>
+                <span className="text-xs font-bold w-5 text-right">{r.Pts}</span>
               </div>
             );
-          }} />
-      </div>
+          })}
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          <ReorderList items={order.map((code,i)=>({key:code, code, pos:i}))} onReorder={arr=>onReorder(letter, arr.map(x=>x.code))}
+            renderItem={(it)=>{
+              const qual = it.pos<2, third = it.pos===2;
+              return (
+                <div className={'flex items-center gap-2 rounded-xl px-2.5 py-2 cursor-grab active:cursor-grabbing border transition '
+                  +(qual?'bg-neon/10 border-neon/30':third?'bg-amber-400/10 border-amber-400/25':'bg-white/[.03] border-white/5')+(fav(it.code)?' ring-1 ring-gold/70':'')}>
+                  <span className={'w-5 h-5 grid place-items-center rounded-md text-[11px] font-bold '
+                    +(qual?'bg-neon text-pitch-950':third?'bg-amber-400 text-pitch-950':'bg-white/10 text-white/50')}>{it.pos+1}</span>
+                  <Flag code={it.code} cls="text-lg" />
+                  <span className="text-sm font-medium truncate flex-1">{TEAMS[it.code].name}{fav(it.code)&&<span className="text-gold"> ★</span>}</span>
+                  {qual && <Pill>{tr('qual')}</Pill>}
+                  {third && <Pill tone="muted">{tr('third')}</Pill>}
+                  <span className="text-white/20 text-xs">⠿</span>
+                </div>
+              );
+            }} />
+        </div>
+      )}
+
+      {edit && (
+        <div className="mt-2 border-t border-white/5 pt-2">
+          <div className="text-[10px] text-white/40 font-semibold mb-1.5">{tr('enterScores')}</div>
+          <div className="space-y-1">
+            {GROUP_FIXTURES.map((fx,i)=>{
+              const A=teams[fx[0]], B=teams[fx[1]], sc=(scores&&scores[i])||{};
+              const Inp=({side})=> <input type="number" min="0" value={sc[side]??''}
+                onChange={e=>onScore(letter,i,side,e.target.value===''?null:Math.max(0,parseInt(e.target.value)||0))}
+                className="w-8 text-center bg-white/5 border border-white/10 rounded py-0.5 text-xs font-bold focus:border-neon/60 outline-none" />;
+              return (
+                <div key={i} className="flex items-center gap-1.5 text-xs">
+                  <span className="flex-1 text-right truncate">{TEAMS[A].name} <Flag code={A}/></span>
+                  <Inp side="h" /><span className="text-white/30">–</span><Inp side="a" />
+                  <span className="flex-1 truncate"><Flag code={B}/> {TEAMS[B].name}</span>
+                </div>
+              );
+            })}
+          </div>
+          {played && <button onClick={()=>onClear(letter)} className="text-[10px] text-white/40 hover:text-red-300 mt-1.5">{tr('clearScores')}</button>}
+        </div>
+      )}
     </div>
   );
 }
 
-function GroupStage({state, setStandings}){
+function GroupStage({state, setStandings, setGroupScore, clearGroupScores}){
   return (
     <div>
-      <SectionHead title="Group Stage" sub="Drag teams to set the final standing in each of the 12 groups. Top 2 qualify directly; 3rd place enters the ranking." />
+      <SectionHead title={tr('groupTitle')} sub={tr('groupSub')} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {GROUP_LETTERS.map(g=>(
-          <GroupCard key={g} letter={g} order={state.standings[g]}
-            onReorder={(letter,order)=>setStandings(letter,order)} />
-        ))}
+        {GROUP_LETTERS.map(g=>{
+          const computed = computeGroup(g, GROUPS[g], state.groupScores[g]);
+          return (
+            <GroupCard key={g} letter={g} order={state.standings[g]} scores={state.groupScores[g]}
+              played={computed.played} computed={computed} favorite={state.favorite}
+              onReorder={(l,o)=>setStandings(l,o)} onScore={setGroupScore} onClear={clearGroupScores} />
+          );
+        })}
       </div>
     </div>
   );
@@ -349,11 +644,11 @@ function GroupStage({state, setStandings}){
 /* ============================================================
    THIRD PLACE RANKING (drag & drop)
    ============================================================ */
-function ThirdPlace({state, setThirdRanking}){
+function ThirdPlace({state, setThirdRanking, favorite}){
   const items = state.thirdRanking.map((g,i)=>({key:g, g, code:state.standings[g][2], pos:i}));
   return (
     <div>
-      <SectionHead title="Best Third-Placed Teams" sub="Rank all 12 third-placed teams. The top 8 qualify for the Round of 32; the bottom 4 are eliminated." />
+      <SectionHead title={tr('thirdsTitle')} sub={tr('thirdsSub')} />
       <div className="glass rounded-2xl p-3 max-w-2xl mx-auto">
         <div className="space-y-1.5">
           <ReorderList items={items} onReorder={arr=>setThirdRanking(arr.map(x=>x.g))}
@@ -361,13 +656,13 @@ function ThirdPlace({state, setThirdRanking}){
               const qual = it.pos<8;
               return (
                 <div className={'flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-grab active:cursor-grabbing border transition '
-                  +(qual?'bg-neon/10 border-neon/30':'bg-white/[.02] border-white/5 opacity-50')}>
+                  +(qual?'bg-neon/10 border-neon/30':'bg-white/[.02] border-white/5 opacity-50')+(favorite===it.code?' ring-1 ring-gold/70':'')}>
                   <span className={'w-6 h-6 grid place-items-center rounded-lg text-xs font-bold '
                     +(qual?'bg-neon text-pitch-950':'bg-white/10 text-white/40')}>{it.pos+1}</span>
                   <Flag code={it.code} cls="text-xl" />
-                  <span className="text-sm font-semibold flex-1 truncate">{TEAMS[it.code].name}</span>
-                  <Pill tone="muted">Group {it.g}</Pill>
-                  {qual ? <Pill>QUALIFIES</Pill> : <span className="text-[10px] font-semibold text-red-400/80">ELIMINATED</span>}
+                  <span className="text-sm font-semibold flex-1 truncate">{TEAMS[it.code].name}{favorite===it.code&&<span className="text-gold"> ★</span>}</span>
+                  <Pill tone="muted">{tr('groupOf',{g:it.g})}</Pill>
+                  {qual ? <Pill>{tr('qualifies')}</Pill> : <span className="text-[10px] font-semibold text-red-400/80">{tr('eliminated')}</span>}
                   <span className="text-white/20">⠿</span>
                 </div>
               );
@@ -390,8 +685,8 @@ function TeamRow({code, isWinner, decided, onPick, thirdGroup}){
         +(decided&&isWinner?'bg-neon/15 ':'')
         +(decided&&!isWinner?'opacity-40 ':'')}>
       <Flag code={code} cls="text-lg" />
-      <span className="text-sm font-medium flex-1 truncate">{code?TEAMS[code].name:<span className="text-white/30 italic">TBD</span>}</span>
-      {thirdGroup && <Pill tone="muted">3rd {thirdGroup}</Pill>}
+      <span className="text-sm font-medium flex-1 truncate">{code?TEAMS[code].name:<span className="text-white/30 italic">{tr('tbd')}</span>}</span>
+      {thirdGroup && <Pill tone="muted">{tr('third')} {thirdGroup}</Pill>}
       {decided&&isWinner && <span className="text-neon text-xs">✓</span>}
     </button>
   );
@@ -402,8 +697,8 @@ function MatchCard({m, teams, winnerOf, onPick}){
   return (
     <div className="glass rounded-xl overflow-hidden divide-y divide-white/5 slidein">
       <div className="flex items-center justify-between px-3 py-1 bg-black/20">
-        <span className="text-[10px] text-white/40 font-semibold">MATCH {m.id}</span>
-        {w && <span className="text-[10px] text-neon font-semibold pop">→ advances</span>}
+        <span className="text-[10px] text-white/40 font-semibold">{tr('match')} {m.id}</span>
+        {w && <span className="text-[10px] text-neon font-semibold pop">{tr('advances')}</span>}
       </div>
       <TeamRow code={t.home} thirdGroup={t.thirdGroup} isWinner={w===t.home} decided={!!w}
         onPick={t.home?()=>onPick(m.id, t.home):null} />
@@ -431,7 +726,7 @@ function KnockoutList({resolved, onPick}){
           <button key={r.key} onClick={()=>setActive(r.key)}
             className={'whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-semibold border transition '
               +(active===r.key?'bg-neon text-pitch-950 border-neon':'bg-white/5 text-white/70 border-white/10 hover:border-neon/40')}>
-            {ROUND_META[r.key].label}
+            {roundLabel(r.key)}
             <span className={'ml-1.5 '+(active===r.key?'text-pitch-950/70':'text-white/40')}>{counts[r.key]}/{r.list.length}</span>
           </button>
         ))}
@@ -486,20 +781,23 @@ const BK = (()=>{
   return {layout, connectors, allIds, cardW, cardH, totalW};
 })();
 
-function BracketMatch({id, teams, winnerOf, onPick, pos}){
+function BracketMatch({id, teams, winnerOf, onPick, pos, favorite}){
   const t=teams[id]||{}, w=winnerOf(id), p=pos[id]; if(!p) return null;
-  const label = id===104?'FINAL' : id===103?'3RD PLACE' : null;
+  const label = id===104?tr('finalLabel') : id===103?tr('thirdPlaceLabel') : null;
+  const hasFav = favorite && (t.home===favorite || t.away===favorite);
   const row=(code)=>{
-    const win=w&&w===code, lose=w&&code&&w!==code;
+    const win=w&&w===code, lose=w&&code&&w!==code, isFav=code&&code===favorite;
     return <div className={'bk-team '+(!code?'tbd ':win?'win ':lose?'lose ':'')}
-      onClick={code&&onPick?()=>onPick(id,code):undefined}>
+      onClick={code&&onPick?()=>onPick(id,code):undefined}
+      style={isFav?{boxShadow:'inset 3px 0 0 #ffd23f'}:undefined}>
       <span style={{fontSize:18,lineHeight:1}}>{code?TEAMS[code].flag:'🏳️'}</span>
-      <span className="bk-code">{code||'TBD'}</span>
+      <span className="bk-code">{code||tr('tbd')}</span>
+      {isFav && <span style={{marginLeft:'auto',color:'#ffd23f',fontSize:12}}>★</span>}
     </div>;
   };
   return (
     <div className="bk-card" style={{left:p.x, top:p.y, width:BK.cardW,
-        boxShadow: id===104?'0 0 22px rgba(255,210,63,.35)':'none',
+        boxShadow: id===104?'0 0 22px rgba(255,210,63,.35)':hasFav?'0 0 0 1.5px rgba(255,210,63,.6)':'none',
         borderColor: id===104?'rgba(255,210,63,.5)':undefined}}>
       {label && <div className="text-center text-[8px] font-bold tracking-widest py-0.5"
           style={{color:id===104?'#ffd23f':'#9aa0c0',background:'rgba(0,0,0,.3)'}}>{label}</div>}
@@ -510,7 +808,7 @@ function BracketMatch({id, teams, winnerOf, onPick, pos}){
   );
 }
 
-function Bracket({resolved, onPick, fixedScale}){
+function Bracket({resolved, onPick, fixedScale, favorite}){
   const {pos,totalW,height}=useMemo(()=>BK.layout(),[]);
   const segs=useMemo(()=>BK.connectors(pos),[pos]);
   const wrapRef=useRef(); const [scale,setScale]=useState(fixedScale||1);
@@ -528,7 +826,7 @@ function Bracket({resolved, onPick, fixedScale}){
             {segs.map((d,i)=><path key={i} d={d} fill="none" stroke="rgba(255,46,136,.5)" strokeWidth="2"/>)}
           </svg>
           {BK.allIds.map(id=>(
-            <BracketMatch key={id} id={id} teams={resolved.teams} winnerOf={resolved.winnerOf} onPick={onPick} pos={pos} />
+            <BracketMatch key={id} id={id} teams={resolved.teams} winnerOf={resolved.winnerOf} onPick={onPick} pos={pos} favorite={favorite} />
           ))}
         </div>
       </div>
@@ -536,7 +834,7 @@ function Bracket({resolved, onPick, fixedScale}){
   );
 }
 
-function Knockout({resolved, onPick}){
+function Knockout({resolved, onPick, favorite}){
   const [view,setView]=useState('bracket');
   const decided = R32.length + LATER.length;
   const done = [...R32,...LATER].filter(m=>resolved.winnerOf(m.id)).length;
@@ -544,21 +842,21 @@ function Knockout({resolved, onPick}){
     <div>
       <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black">Knockout Bracket</h2>
-          <p className="text-sm text-white/50">Tap a team to advance them. Winners flow through automatically. <span className="text-neon font-semibold">{done}/{decided}</span> picked.</p>
+          <h2 className="text-xl sm:text-2xl font-black">{tr('knockoutTitle')}</h2>
+          <p className="text-sm text-white/50">{tr('knockoutSub',{done:done, total:decided})}</p>
         </div>
         <div className="flex rounded-lg border border-white/10 overflow-hidden text-xs font-bold shrink-0">
           {['bracket','list'].map(v=>(
             <button key={v} onClick={()=>setView(v)}
-              className={'px-3 py-1.5 capitalize '+(view===v?'bg-neon text-pitch-950':'text-white/60 hover:text-white')}>{v}</button>
+              className={'px-3 py-1.5 '+(view===v?'bg-neon text-pitch-950':'text-white/60 hover:text-white')}>{tr(v==='bracket'?'viewBracket':'viewList')}</button>
           ))}
         </div>
       </div>
       {view==='bracket' ? (
         <div style={{width:'100vw', position:'relative', left:'50%', marginLeft:'-50vw', paddingLeft:'12px', paddingRight:'12px'}}>
           <div className="glass rounded-2xl p-3 sm:p-4">
-            <Bracket resolved={resolved} onPick={onPick} />
-            <p className="text-center text-[11px] text-white/35 mt-2">Drag horizontally if it overflows · switch to <b>List</b> view for easier tapping on mobile.</p>
+            <Bracket resolved={resolved} onPick={onPick} favorite={favorite} />
+            <p className="text-center text-[11px] text-white/35 mt-2">{tr('bracketHint')}</p>
           </div>
         </div>
       ) : <KnockoutList resolved={resolved} onPick={onPick} />}
@@ -601,15 +899,15 @@ const ExportSheet = React.forwardRef(({state, resolved}, ref)=>{
           <div style={{display:'flex',alignItems:'center',gap:16}}>
             <div style={{fontSize:46}}>🏆</div>
             <div>
-              <div style={{fontSize:40,fontWeight:900,letterSpacing:'-.5px',color:'#eef0ff'}}>WORLD CUP 26 — MY BRACKET</div>
-              <div style={{fontSize:15,color:'#9aa0c0',marginTop:4}}>🇨🇦 🇲🇽 🇺🇸 · Predicted knockout bracket</div>
+              <div style={{fontSize:40,fontWeight:900,letterSpacing:'-.5px',color:'#eef0ff'}}>{tr('exportTitle')}</div>
+              <div style={{fontSize:15,color:'#9aa0c0',marginTop:4}}>🇨🇦 🇲🇽 🇺🇸 · {tr('exportSub')}</div>
             </div>
           </div>
           {champion && (
             <div style={{textAlign:'right'}}>
-              <div style={{fontSize:13,fontWeight:800,letterSpacing:'.2em',color:'#ffd23f'}}>🏆 CHAMPION</div>
+              <div style={{fontSize:13,fontWeight:800,letterSpacing:'.2em',color:'#ffd23f'}}>{tr('exportChamp')}</div>
               <div style={{fontSize:32,fontWeight:900}}>{TEAMS[champion].flag} {TEAMS[champion].name}</div>
-              <div style={{fontSize:14,color:'#9aa0c0',marginTop:2}}>2nd {runnerUp?TEAMS[runnerUp].name:'—'} · 3rd {third?TEAMS[third].name:'—'}</div>
+              <div style={{fontSize:14,color:'#9aa0c0',marginTop:2}}>2.º {runnerUp?TEAMS[runnerUp].name:'—'} · 3.º {third?TEAMS[third].name:'—'}</div>
             </div>
           )}
         </div>
@@ -618,7 +916,7 @@ const ExportSheet = React.forwardRef(({state, resolved}, ref)=>{
           <div style={{width:BK.totalW,flexShrink:0}}><Bracket resolved={resolved} onPick={null} fixedScale={1} /></div>
           <Panel letters={half2} />
         </div>
-        <div style={{fontSize:12,color:'#71768f',marginTop:18,textAlign:'center'}}>Unofficial fan-made predictor · Not affiliated with FIFA · Generated with the WC26 Bracket Predictor</div>
+        <div style={{fontSize:12,color:'#71768f',marginTop:18,textAlign:'center'}}>{tr('exportFooter')}</div>
       </div>
     </div>
   );
@@ -628,7 +926,7 @@ const ExportSheet = React.forwardRef(({state, resolved}, ref)=>{
    RESULTS
    ============================================================ */
 function Podium({code, place}){
-  const meta = {1:{t:'CHAMPION',c:'gold',h:'h-44',z:'text-5xl'},2:{t:'RUNNER-UP',c:'#cbd5e1',h:'h-32',z:'text-4xl'},3:{t:'THIRD PLACE',c:'#cd7f32',h:'h-24',z:'text-4xl'}}[place];
+  const meta = {1:{t:'champion',c:'gold',h:'h-44',z:'text-5xl'},2:{t:'runnerUp',c:'#cbd5e1',h:'h-32',z:'text-4xl'},3:{t:'thirdPlace',c:'#cd7f32',h:'h-24',z:'text-4xl'}}[place];
   return (
     <div className="flex flex-col items-center justify-end">
       <div className={'text-center mb-2 '+(code?'pop':'opacity-30')}>
@@ -638,27 +936,28 @@ function Podium({code, place}){
       <div className={'w-24 sm:w-28 '+meta.h+' rounded-t-xl glass grid place-items-center'} style={{borderColor:meta.c+'66'}}>
         <div className="text-center">
           <div className="text-2xl font-black" style={{color:meta.c}}>{place}</div>
-          <div className="text-[9px] tracking-widest font-bold" style={{color:meta.c}}>{meta.t}</div>
+          <div className="text-[9px] tracking-widest font-bold" style={{color:meta.c}}>{tr(meta.t)}</div>
         </div>
       </div>
     </div>
   );
 }
 
-function Results({resolved}){
+function Results({resolved, favorite}){
   const {champion, runnerUp, third} = resolved;
+  const favFinish = favorite ? (favorite===champion?tr('favWon'):favorite===runnerUp?tr('favRunner'):favorite===third?tr('favThird'):null) : null;
   return (
     <div className="text-center">
-      <SectionHead title="Final Results" sub="Your predicted podium for the FIFA World Cup 2026." />
+      <SectionHead title={tr('resultsTitle')} sub={tr('resultsSub')} />
       {champion ? (
         <div className="mb-8 slidein">
-          <div className="text-xs tracking-[0.3em] text-gold/80 font-bold mb-1">🏆 WORLD CHAMPIONS 🏆</div>
+          <div className="text-xs tracking-[0.3em] text-gold/80 font-bold mb-1">{tr('worldChampions')}</div>
           <div className="text-6xl my-3 pop">{TEAMS[champion].flag}</div>
           <div className="text-3xl font-black trophy-shine">{TEAMS[champion].name}</div>
         </div>
       ) : (
         <div className="glass rounded-2xl p-8 max-w-md mx-auto text-white/50">
-          Complete the Final to crown your champion.
+          {tr('completeFinal')}
         </div>
       )}
       <div className="flex items-end justify-center gap-2 sm:gap-4 mt-6">
@@ -666,6 +965,11 @@ function Results({resolved}){
         <Podium code={champion} place={1} />
         <Podium code={third} place={3} />
       </div>
+      {favorite && (
+        <div className="mt-6 inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm">
+          <span className="text-gold">★</span> {tr('yourFav')} <b>{TEAMS[favorite].flag} {TEAMS[favorite].name}</b> {favFinish || tr('favNone')}
+        </div>
+      )}
     </div>
   );
 }
@@ -714,14 +1018,87 @@ function simulate(mode){
   return st;
 }
 
+/* ---- Monte Carlo title odds (FIFA-rank weighted) ---- */
+function simOnce(){
+  const standings={}; GROUP_LETTERS.forEach(g=>standings[g]=orderGroup(GROUPS[g],'sim'));
+  const thirdRanking = GROUP_LETTERS.map(g=>({g,s:STRENGTH(standings[g][2])+Math.random()*40})).sort((a,b)=>b.s-a.s).map(x=>x.g);
+  const base = resolveBracket({standings, thirdRanking, picks:{}});  // R32 fixtures only
+  const winners={}, at={};
+  R32.forEach(m=>{ const t=base.teams[m.id]; at[m.id]=[t.home,t.away]; winners[m.id]=pickWeighted(t.home,t.away,6); });
+  LATER.forEach(m=>{
+    const get = ref => ref.w!==undefined ? winners[ref.w]
+      : (()=>{ const t=at[ref.l], w=winners[ref.l]; return w? (w===t[0]?t[1]:t[0]) : null; })();
+    const h=get(m.a), a=get(m.b); at[m.id]=[h,a]; winners[m.id]=pickWeighted(h,a,6);
+  });
+  return {at, winners};
+}
+function runOdds(n=4000){
+  const reach={}; Object.keys(TEAMS).forEach(c=>reach[c]={R32:0,R16:0,QF:0,SF:0,FINAL:0,CHAMP:0});
+  const R16=LATER.filter(m=>m.round==='R16'), QF=LATER.filter(m=>m.round==='QF'), SF=LATER.filter(m=>m.round==='SF');
+  for(let k=0;k<n;k++){
+    const {at,winners}=simOnce();
+    R32.forEach(m=>{ const [h,a]=at[m.id]; if(h)reach[h].R32++; if(a)reach[a].R32++; const w=winners[m.id]; if(w)reach[w].R16++; });
+    R16.forEach(m=>{ const w=winners[m.id]; if(w)reach[w].QF++; });
+    QF.forEach(m=>{ const w=winners[m.id]; if(w)reach[w].SF++; });
+    SF.forEach(m=>{ const w=winners[m.id]; if(w)reach[w].FINAL++; });
+    const champ=winners[104]; if(champ)reach[champ].CHAMP++;
+  }
+  return Object.keys(reach).map(c=>{
+    const r=reach[c]; const o={code:c}; Object.keys(r).forEach(k=>o[k]=r[k]/n); return o;
+  }).sort((a,b)=> b.CHAMP-a.CHAMP || b.FINAL-a.FINAL || b.SF-a.SF || b.R16-a.R16);
+}
+const pct = v => v>=0.095 ? Math.round(v*100)+'%' : v>=0.01 ? (v*100).toFixed(1)+'%' : v>0 ? '<1%' : '—';
+
+function OddsModal({onClose, favorite}){
+  const [rows,setRows]=useState(null);
+  useEffect(()=>{ const t=setTimeout(()=>{ try{ setRows(runOdds(4000)); }catch(e){ setRows([]); } }, 30); return ()=>clearTimeout(t); },[]);
+  return (
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center p-3 overflow-auto" onClick={onClose}>
+      <div className="glass rounded-2xl max-w-xl w-full p-4 my-6 slidein" onClick={e=>e.stopPropagation()}>
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h3 className="font-black text-lg">{tr('oddsTitle')}</h3>
+            <p className="text-[11px] text-white/45">{tr('oddsSub')}</p>
+          </div>
+          <button onClick={onClose} className="text-white/50 hover:text-white text-2xl leading-none px-1">×</button>
+        </div>
+        {!rows ? (
+          <div className="py-16 text-center text-white/50"><div className="text-3xl mb-2 pop">🎲</div>{tr('oddsRunning')}</div>
+        ) : (
+          <div className="overflow-x-auto max-h-[70vh]">
+            <table className="w-full text-xs">
+              <thead className="text-white/40 sticky top-0 bg-pitch-900/90 backdrop-blur">
+                <tr><th className="text-left py-1 pl-1">{tr('colTeam')}</th><th className="px-2">{tr('colWin')}</th><th className="px-2">{tr('colFinal')}</th><th className="px-2">{tr('colSF')}</th><th className="px-2">{tr('colQF')}</th><th className="px-2 pr-1">{tr('colR16')}</th></tr>
+              </thead>
+              <tbody>
+                {rows.filter(r=>r.R32>0.001).slice(0,32).map((r,i)=>(
+                  <tr key={r.code} className={'border-t border-white/5 '+(favorite===r.code?'text-gold':'')}>
+                    <td className="py-1.5 pl-1 whitespace-nowrap"><span className="text-white/30 mr-1 tabular-nums">{i+1}</span><Flag code={r.code}/> <span className="font-semibold">{TEAMS[r.code].name}{favorite===r.code?' ★':''}</span></td>
+                    <td className="text-center px-2 font-bold text-neon">{pct(r.CHAMP)}</td>
+                    <td className="text-center px-2 text-white/75">{pct(r.FINAL)}</td>
+                    <td className="text-center px-2 text-white/55">{pct(r.SF)}</td>
+                    <td className="text-center px-2 text-white/45">{pct(r.QF)}</td>
+                    <td className="text-center px-2 pr-1 text-white/35">{pct(r.R16)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="text-[10px] text-white/30 mt-2">{tr('oddsNote')}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ============================================================
    APP
    ============================================================ */
 const STEPS = [
-  {key:'groups', label:'Groups'},
-  {key:'thirds', label:'3rd Place'},
-  {key:'knockout', label:'Knockout'},
-  {key:'results', label:'Results'},
+  {key:'groups', lk:'stepGroups'},
+  {key:'thirds', lk:'stepThirds'},
+  {key:'knockout', lk:'stepKnockout'},
+  {key:'results', lk:'stepResults'},
 ];
 const STEP_IDX = Object.fromEntries(STEPS.map((s,i)=>[s.key,i]));
 function initMaxStep(s){
@@ -735,11 +1112,22 @@ function App(){
   const [maxStep, setMaxStep] = useState(()=>initMaxStep(loadInitial()));
   const [toast, setToast] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [showOdds, setShowOdds] = useState(false);
   const sheetRef = useRef(null);
 
   // persist
   useEffect(()=>{ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }, [state]);
 
+  // apply colour theme via CSS variables
+  useEffect(()=>{
+    const th = THEMES[state.theme] || THEMES.magenta; const r = document.documentElement.style;
+    th.c.forEach((c,i)=>r.setProperty('--c'+(i+1), c));
+    th.glow.forEach((g,i)=>r.setProperty('--g'+(i+1), g));
+  }, [state.theme]);
+  // reflect language on <html lang> for a11y/SEO
+  useEffect(()=>{ try{ document.documentElement.lang = state.lang||'en'; }catch(e){} }, [state.lang]);
+
+  LANG = I18N[state.lang] ? state.lang : 'en';             // set active language before children render
   const resolved = useMemo(()=>resolveBracket(state), [state]);
   const champ = !!resolved.champion;                       // Final decided → results unlock
   const complete = champ && !!resolved.third;              // Final + 3rd-place done → export unlocks
@@ -748,31 +1136,50 @@ function App(){
   const flash = msg => { setToast(msg); setTimeout(()=>setToast(null), 2200); };
   const goto = key => {
     if(STEP_IDX[key] <= maxStep){ setStep(key); window.scrollTo({top:0,behavior:'smooth'}); }
-    else flash('🔒 Complete the previous step first');
+    else flash(tr('lockedStep'));
   };
   const unlockTo = key => setMaxStep(m=>Math.max(m, STEP_IDX[key]));
 
   const setStandings = (g, order)=> setState(s=>({...s, standings:{...s.standings, [g]:order}}));
   const setThirdRanking = order => setState(s=>({...s, thirdRanking:order}));
+  const setGroupScore = (letter, idx, side, value)=> setState(s=>{
+    const gs={...s.groupScores}; const grp={...(gs[letter]||{})};
+    grp[idx]={...(grp[idx]||{h:null,a:null}), [side]:value}; gs[letter]=grp;
+    const comp=computeGroup(letter, GROUPS[letter], gs[letter]);
+    return {...s, groupScores:gs, standings:{...s.standings, [letter]:comp.order}};
+  });
+  const clearGroupScores = (letter)=> setState(s=>{
+    const gs={...s.groupScores}; delete gs[letter];
+    return {...s, groupScores:gs, standings:{...s.standings, [letter]:[...GROUPS[letter]]}};
+  });
+  const setFavorite = code => setState(s=>({...s, favorite:code||null}));
+  const setTheme = th => setState(s=>({...s, theme:th}));
+  const setLang = l => setState(s=>({...s, lang:l}));
   const onPick = (id, code)=> setState(s=>{
     const picks={...s.picks};
     if(picks[id]===code) delete picks[id]; else picks[id]=code;
     return {...s, picks:clearDownstream(id, {...s, picks})};
   });
 
-  const doRandom = ()=>{ setState(simulate('random')); setMaxStep(3); flash('🎲 Random bracket generated'); setStep('results'); };
-  const doSim    = ()=>{ setState(simulate('sim'));    setMaxStep(3); flash('🤖 Simulated by FIFA ranking'); setStep('results'); };
-  const doReset  = ()=>{ setState(defaultState()); setMaxStep(0); flash('Reset'); setStep('groups'); };
+  const applySimulation = mode => {
+    setState(s=>({...simulate(mode), favorite:s.favorite, theme:s.theme, lang:s.lang}));
+    setMaxStep(3);
+    flash(tr(mode==='random'?'toastRandom':'toastSim'));
+    setStep('results');
+  };
+  const doRandom = ()=>applySimulation('random');
+  const doSim    = ()=>applySimulation('sim');
+  const doReset  = ()=>{ setState({...defaultState(), lang:state.lang, theme:state.theme}); setMaxStep(0); flash(tr('toastReset')); setStep('groups'); };
 
   const doShare = async ()=>{
     const url = location.origin+location.pathname+'#s='+encodeState(state);
-    try{ await navigator.clipboard.writeText(url); flash('🔗 Share link copied to clipboard'); }
-    catch(e){ location.hash='s='+encodeState(state); flash('🔗 Share link in address bar'); }
+    try{ await navigator.clipboard.writeText(url); flash(tr('toastShareCopied')); }
+    catch(e){ location.hash='s='+encodeState(state); flash(tr('toastShareBar')); }
   };
 
   const exportImage = async (asPdf)=>{
-    if(!complete){ flash('🔒 Finish your bracket to unlock export'); return; }
-    setBusy(true); flash('Rendering your bracket…');
+    if(!complete){ flash(tr('toastExportLock')); return; }
+    setBusy(true); flash(tr('toastRendering'));
     await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,80)));
     try{
       const node = sheetRef.current.firstChild; // the fixed-width composition
@@ -783,12 +1190,12 @@ function App(){
         const img=canvas.toDataURL('image/png');
         const pdf=new jsPDF({orientation:'l', unit:'px', format:[canvas.width,canvas.height]});
         pdf.addImage(img,'PNG',0,0,canvas.width,canvas.height);
-        pdf.save('wc2026-bracket.pdf'); flash('📄 PDF downloaded');
+        pdf.save('wc2026-bracket.pdf'); flash(tr('toastPdf'));
       } else {
         const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='wc2026-bracket.png'; a.click();
-        flash('🖼️ PNG downloaded');
+        flash(tr('toastPng'));
       }
-    } catch(e){ flash('Export failed — try again'); }
+    } catch(e){ flash(tr('toastExportFail')); }
     setBusy(false);
   };
 
@@ -803,7 +1210,7 @@ function App(){
             <div>
               <h1 className="font-black leading-none text-lg sm:text-xl spectrum-text tracking-tight">WORLD CUP 26</h1>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-[10px] text-white/45 leading-none font-semibold">Bracket Predictor</span>
+                <span className="text-[10px] text-white/45 leading-none font-semibold">{tr('brandSub')}</span>
                 <span className="text-white/15">•</span>
                 <span className="text-xs leading-none" title="Canada · Mexico · USA">🇨🇦 🇲🇽 🇺🇸</span>
               </div>
@@ -811,12 +1218,41 @@ function App(){
           </div>
           <div className="flex-1" />
           <div className="flex items-center gap-1.5 flex-wrap text-xs">
-            <ToolBtn onClick={doRandom}>🎲 Random</ToolBtn>
-            <ToolBtn onClick={doSim}>🤖 Simulate</ToolBtn>
-            <ToolBtn onClick={doShare}>🔗 Share</ToolBtn>
-            <ToolBtn onClick={()=>exportImage(false)} disabled={!complete||busy} title={complete?'Download bracket PNG':'Finish your bracket to unlock'}>🖼️ PNG</ToolBtn>
-            <ToolBtn onClick={()=>exportImage(true)} disabled={!complete||busy} title={complete?'Download bracket PDF':'Finish your bracket to unlock'}>📄 PDF</ToolBtn>
-            <ToolBtn onClick={doReset} danger>↺ Reset</ToolBtn>
+            <ToolBtn onClick={doRandom}>🎲 {tr('btnRandom')}</ToolBtn>
+            <ToolBtn onClick={doSim}>🤖 {tr('btnSim')}</ToolBtn>
+            <ToolBtn onClick={()=>setShowOdds(true)}>📊 {tr('btnOdds')}</ToolBtn>
+            <ToolBtn onClick={doShare}>🔗 {tr('btnShare')}</ToolBtn>
+            <ToolBtn onClick={()=>exportImage(false)} disabled={!complete||busy}>🖼️ PNG</ToolBtn>
+            <ToolBtn onClick={()=>exportImage(true)} disabled={!complete||busy}>📄 PDF</ToolBtn>
+            <ToolBtn onClick={doReset} danger>↺ {tr('btnReset')}</ToolBtn>
+          </div>
+        </div>
+        {/* favourite + theme + language bar */}
+        <div className="max-w-6xl mx-auto px-4 pb-2 flex items-center gap-2 flex-wrap">
+          <span className="text-[11px] text-white/40 font-semibold">★ {tr('favourite')}</span>
+          <select value={state.favorite||''} onChange={e=>setFavorite(e.target.value)}
+            className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[11px] text-white/80 outline-none focus:border-neon/50 max-w-[160px]">
+            <option value="">{tr('none')}</option>
+            {Object.keys(TEAMS).sort((a,b)=>TEAMS[a].name.localeCompare(TEAMS[b].name)).map(c=>(
+              <option key={c} value={c}>{TEAMS[c].flag} {TEAMS[c].name}</option>
+            ))}
+          </select>
+          <span className="w-px h-4 bg-white/10 mx-1" />
+          <span className="text-[11px] text-white/40 font-semibold">{tr('theme')}</span>
+          <div className="flex items-center gap-1">
+            {Object.entries(THEMES).map(([k,th])=>(
+              <button key={k} title={th.label} onClick={()=>setTheme(k)}
+                className={'w-5 h-5 rounded-full border-2 transition '+(state.theme===k?'border-white scale-110':'border-white/20 hover:border-white/50')}
+                style={{background:`linear-gradient(135deg,${th.c[0]},${th.c[2]},${th.c[3]})`}} />
+            ))}
+          </div>
+          <span className="w-px h-4 bg-white/10 mx-1" />
+          <span className="text-[11px] text-white/40 font-semibold">{tr('language')}</span>
+          <div className="flex items-center gap-0.5">
+            {LANGS.map(([code,lbl])=>(
+              <button key={code} onClick={()=>setLang(code)}
+                className={'px-1.5 py-0.5 rounded text-[10px] font-bold border transition '+(state.lang===code?'bg-neon text-pitch-950 border-neon':'border-white/15 text-white/55 hover:border-neon/40')}>{lbl}</button>
+            ))}
           </div>
         </div>
         {/* STEP NAV */}
@@ -829,7 +1265,7 @@ function App(){
                   +(step===s.key?'bg-neon text-pitch-950 border-neon'
                     : locked?'bg-white/[.02] text-white/25 border-white/5 cursor-not-allowed'
                     : 'bg-white/5 text-white/60 border-white/10 hover:border-neon/40')}>
-                <span className="mr-1 opacity-70">{locked?'🔒':i+1}</span>{s.label}
+                <span className="mr-1 opacity-70">{locked?'🔒':i+1}</span>{tr(s.lk)}
               </button>
             );
           })}
@@ -838,10 +1274,10 @@ function App(){
 
       {/* BODY */}
       <main className="max-w-6xl mx-auto px-4 py-6">
-        {step==='groups'   && <GroupStage state={state} setStandings={setStandings} />}
-        {step==='thirds'   && <ThirdPlace state={state} setThirdRanking={setThirdRanking} />}
-        {step==='knockout' && <Knockout resolved={resolved} onPick={onPick} />}
-        {step==='results'  && <Results resolved={resolved} />}
+        {step==='groups'   && <GroupStage state={state} setStandings={setStandings} setGroupScore={setGroupScore} clearGroupScores={clearGroupScores} />}
+        {step==='thirds'   && <ThirdPlace state={state} setThirdRanking={setThirdRanking} favorite={state.favorite} />}
+        {step==='knockout' && <Knockout resolved={resolved} onPick={onPick} favorite={state.favorite} />}
+        {step==='results'  && <Results resolved={resolved} favorite={state.favorite} />}
       </main>
 
       {/* STAGE FOOTER (gated progression) */}
@@ -852,10 +1288,12 @@ function App(){
       <footer className="max-w-6xl mx-auto px-4 pb-10 text-center">
         <div className="spectrum-bar w-24 mx-auto rounded-full mb-3 opacity-60" />
         <p className="text-[11px] text-white/35 leading-relaxed">
-          Unofficial fan-made predictor for the 2026 World Cup · Hosted by Canada, Mexico & the USA.<br/>
-          Not affiliated with, endorsed by, or sponsored by FIFA. All team names belong to their respective associations.
+          {tr('footer1')}<br/>
+          {tr('footer2')}
         </p>
       </footer>
+
+      {showOdds && <OddsModal onClose={()=>setShowOdds(false)} favorite={state.favorite} />}
 
       {toast && <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 glass px-4 py-2 rounded-full text-sm font-semibold pop glow">{toast}</div>}
     </div>
@@ -905,11 +1343,11 @@ function StageFooter({step, champ, complete, goto, unlockTo, setStep}){
   const prev = STEP_IDX[step]>0 ? STEPS[STEP_IDX[step]-1] : null;
   return (
     <div className="max-w-6xl mx-auto px-4 pb-8 flex justify-between items-center gap-3">
-      {prev ? <Btn onClick={()=>goto(prev.key)}>← {prev.label}</Btn> : <span/>}
-      {step==='groups'   && <Btn primary onClick={()=>proceed('thirds')}>Continue to 3rd Place →</Btn>}
-      {step==='thirds'   && <Btn primary onClick={()=>proceed('knockout')}>Continue to Knockout →</Btn>}
-      {step==='knockout' && <Btn primary disabled={!champ} onClick={()=>proceed('results')}>{champ?'View Results →':'🔒 Pick the Final first'}</Btn>}
-      {step==='results'  && <span className="text-xs text-white/40 self-center text-right">{complete?'Export your bracket with 🖼️ PNG / 📄 PDF above':'Pick the 3rd-place match in Knockout to unlock export'}</span>}
+      {prev ? <Btn onClick={()=>goto(prev.key)}>← {tr(prev.lk)}</Btn> : <span/>}
+      {step==='groups'   && <Btn primary onClick={()=>proceed('thirds')}>{tr('contTo',{x:tr('stepThirds')})}</Btn>}
+      {step==='thirds'   && <Btn primary onClick={()=>proceed('knockout')}>{tr('contTo',{x:tr('stepKnockout')})}</Btn>}
+      {step==='knockout' && <Btn primary disabled={!champ} onClick={()=>proceed('results')}>{champ?tr('viewResults'):tr('pickFinal')}</Btn>}
+      {step==='results'  && <span className="text-xs text-white/40 self-center text-right">{complete?tr('exportHint'):tr('toastExportLock')}</span>}
     </div>
   );
 }
