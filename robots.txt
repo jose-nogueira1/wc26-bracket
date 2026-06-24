@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wc26-bracket-lime.vercel.app/sitemap.xml
