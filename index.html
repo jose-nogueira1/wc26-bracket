@@ -162,7 +162,8 @@ const I18N = {
     enterScores:'Enter scorelines — standings update automatically', clearScores:'Clear group scores',
     qual:'QUAL', third:'3rd',
     thirdsTitle:'Best Third-Placed Teams',
-    thirdsSub:'Rank all 12 third-placed teams. The top 8 qualify for the Round of 32; the bottom 4 are eliminated.',
+    thirdsSub:'The 12 third-placed teams, ranked by group record. The top 8 qualify for the Round of 32; the bottom 4 are eliminated. Drag to adjust ties.',
+    thirdsAutoRank:'↕ Rank by points & GD', thirdsRule:'Order: points → goal difference → goals scored.',
     groupOf:'Group {g}', qualifies:'QUALIFIES', eliminated:'ELIMINATED',
     knockoutTitle:'Knockout Bracket',
     knockoutSub:'Tap a team to advance them. Winners flow through automatically. {done}/{total} picked.',
@@ -198,7 +199,8 @@ const I18N = {
     enterScores:'Insira os resultados — a tabela atualiza automaticamente', clearScores:'Limpar resultados do grupo',
     qual:'APUR', third:'3.º',
     thirdsTitle:'Melhores Terceiros Classificados',
-    thirdsSub:'Ordene os 12 terceiros classificados. Os 8 melhores apuram-se para os 16 avos; os 4 últimos são eliminados.',
+    thirdsSub:'Os 12 terceiros classificados, ordenados pelo registo no grupo. Os 8 melhores apuram-se para os 16 avos; os 4 últimos são eliminados. Arraste para desempatar.',
+    thirdsAutoRank:'↕ Ordenar por pontos e DG', thirdsRule:'Ordem: pontos → diferença de golos → golos marcados.',
     groupOf:'Grupo {g}', qualifies:'APURA-SE', eliminated:'ELIMINADO',
     knockoutTitle:'Quadro Eliminatório',
     knockoutSub:'Toque numa equipa para a fazer avançar. Os vencedores avançam automaticamente. {done}/{total} escolhidos.',
@@ -234,7 +236,8 @@ const I18N = {
     enterScores:'Saisissez les scores — le classement se met à jour automatiquement', clearScores:'Effacer les scores du groupe',
     qual:'QUAL', third:'3e',
     thirdsTitle:'Meilleurs Troisièmes',
-    thirdsSub:'Classez les 12 équipes troisièmes. Les 8 meilleures se qualifient pour les 16es ; les 4 dernières sont éliminées.',
+    thirdsSub:'Les 12 équipes troisièmes, classées selon leur bilan de groupe. Les 8 meilleures se qualifient pour les 16es ; les 4 dernières sont éliminées. Glissez pour départager.',
+    thirdsAutoRank:'↕ Classer par points et diff. de buts', thirdsRule:'Ordre : points → différence de buts → buts marqués.',
     groupOf:'Groupe {g}', qualifies:'QUALIFIÉE', eliminated:'ÉLIMINÉE',
     knockoutTitle:'Tableau Final',
     knockoutSub:'Touchez une équipe pour la faire avancer. Les vainqueurs avancent automatiquement. {done}/{total} choisis.',
@@ -270,7 +273,8 @@ const I18N = {
     enterScores:'Introduce los resultados — la tabla se actualiza automáticamente', clearScores:'Borrar resultados del grupo',
     qual:'CLAS', third:'3.º',
     thirdsTitle:'Mejores Terceros',
-    thirdsSub:'Ordena los 12 terceros clasificados. Los 8 mejores clasifican a los dieciseisavos; los 4 últimos quedan eliminados.',
+    thirdsSub:'Los 12 terceros clasificados, ordenados por su registro de grupo. Los 8 mejores clasifican a los dieciseisavos; los 4 últimos quedan eliminados. Arrastra para desempatar.',
+    thirdsAutoRank:'↕ Ordenar por puntos y DG', thirdsRule:'Orden: puntos → diferencia de goles → goles a favor.',
     groupOf:'Grupo {g}', qualifies:'CLASIFICA', eliminated:'ELIMINADO',
     knockoutTitle:'Cuadro Eliminatorio',
     knockoutSub:'Pulsa un equipo para hacerlo avanzar. Los ganadores avanzan automáticamente. {done}/{total} elegidos.',
@@ -478,6 +482,24 @@ function computeGroup(letter, seededOrder, scores){
   return { rows, order, played:any };
 }
 
+/* Record (Pts/GD/GF/GA) of each group's third-placed team, for ranking. */
+function thirdRecords(standings, groupScores){
+  return GROUP_LETTERS.map(g=>{
+    const code = standings[g][2];
+    const comp = computeGroup(g, GROUPS[g], (groupScores||{})[g]);
+    const row = comp.rows.find(r=>r.code===code) || {Pts:0,GD:0,GF:0,GA:0};
+    return { g, code, Pts:row.Pts, GD:row.GD, GF:row.GF, GA:row.GA, played:comp.played };
+  });
+}
+/* FIFA ranking of the 12 third-placed teams:
+   points → goal difference → goals for → fewer goals against → FIFA rank (deterministic). */
+function computeThirdRanking(standings, groupScores){
+  return thirdRecords(standings, groupScores)
+    .sort((a,b)=> b.Pts-a.Pts || b.GD-a.GD || b.GF-a.GF || a.GA-b.GA
+                 || ((TEAMS[a.code]?.rank??99)-(TEAMS[b.code]?.rank??99)))
+    .map(r=>r.g);
+}
+
 /* ============================================================
    GENERIC DRAG-AND-DROP REORDER LIST
    ============================================================ */
@@ -644,26 +666,33 @@ function GroupStage({state, setStandings, setGroupScore, clearGroupScores}){
 /* ============================================================
    THIRD PLACE RANKING (drag & drop)
    ============================================================ */
-function ThirdPlace({state, setThirdRanking, favorite}){
+function ThirdPlace({state, setThirdRanking, autoRankThirds, favorite}){
+  const recByG = {}; thirdRecords(state.standings, state.groupScores).forEach(r=>recByG[r.g]=r);
+  const anyPlayed = Object.values(recByG).some(r=>r.played);
   const items = state.thirdRanking.map((g,i)=>({key:g, g, code:state.standings[g][2], pos:i}));
   return (
     <div>
       <SectionHead title={tr('thirdsTitle')} sub={tr('thirdsSub')} />
       <div className="glass rounded-2xl p-3 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <span className="text-[11px] text-white/40">{tr('thirdsRule')}</span>
+          <button onClick={autoRankThirds} className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border border-white/10 text-white/70 hover:text-neon hover:border-neon/40 transition">{tr('thirdsAutoRank')}</button>
+        </div>
         <div className="space-y-1.5">
           <ReorderList items={items} onReorder={arr=>setThirdRanking(arr.map(x=>x.g))}
             renderItem={(it)=>{
-              const qual = it.pos<8;
+              const qual = it.pos<8, rec = recByG[it.g] || {Pts:0,GD:0,GF:0};
               return (
-                <div className={'flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-grab active:cursor-grabbing border transition '
+                <div className={'flex items-center gap-2 sm:gap-3 rounded-xl px-3 py-2.5 cursor-grab active:cursor-grabbing border transition '
                   +(qual?'bg-neon/10 border-neon/30':'bg-white/[.02] border-white/5 opacity-50')+(favorite===it.code?' ring-1 ring-gold/70':'')}>
-                  <span className={'w-6 h-6 grid place-items-center rounded-lg text-xs font-bold '
+                  <span className={'w-6 h-6 grid place-items-center rounded-lg text-xs font-bold shrink-0 '
                     +(qual?'bg-neon text-pitch-950':'bg-white/10 text-white/40')}>{it.pos+1}</span>
-                  <Flag code={it.code} cls="text-xl" />
+                  <Flag code={it.code} cls="text-xl shrink-0" />
                   <span className="text-sm font-semibold flex-1 truncate">{TEAMS[it.code].name}{favorite===it.code&&<span className="text-gold"> ★</span>}</span>
+                  {anyPlayed && <span className="text-[10px] text-white/45 tabular-nums hidden sm:inline">{rec.Pts} pts · {rec.GD>0?'+'+rec.GD:rec.GD} GD</span>}
                   <Pill tone="muted">{tr('groupOf',{g:it.g})}</Pill>
                   {qual ? <Pill>{tr('qualifies')}</Pill> : <span className="text-[10px] font-semibold text-red-400/80">{tr('eliminated')}</span>}
-                  <span className="text-white/20">⠿</span>
+                  <span className="text-white/20 shrink-0">⠿</span>
                 </div>
               );
             }} />
@@ -1146,12 +1175,15 @@ function App(){
     const gs={...s.groupScores}; const grp={...(gs[letter]||{})};
     grp[idx]={...(grp[idx]||{h:null,a:null}), [side]:value}; gs[letter]=grp;
     const comp=computeGroup(letter, GROUPS[letter], gs[letter]);
-    return {...s, groupScores:gs, standings:{...s.standings, [letter]:comp.order}};
+    const standings={...s.standings, [letter]:comp.order};
+    return {...s, groupScores:gs, standings, thirdRanking:computeThirdRanking(standings, gs)};
   });
   const clearGroupScores = (letter)=> setState(s=>{
     const gs={...s.groupScores}; delete gs[letter];
-    return {...s, groupScores:gs, standings:{...s.standings, [letter]:[...GROUPS[letter]]}};
+    const standings={...s.standings, [letter]:[...GROUPS[letter]]};
+    return {...s, groupScores:gs, standings, thirdRanking:computeThirdRanking(standings, gs)};
   });
+  const autoRankThirds = ()=> setState(s=>({...s, thirdRanking:computeThirdRanking(s.standings, s.groupScores)}));
   const setFavorite = code => setState(s=>({...s, favorite:code||null}));
   const setTheme = th => setState(s=>({...s, theme:th}));
   const setLang = l => setState(s=>({...s, lang:l}));
@@ -1161,14 +1193,8 @@ function App(){
     return {...s, picks:clearDownstream(id, {...s, picks})};
   });
 
-  const applySimulation = mode => {
-    setState(s=>({...simulate(mode), favorite:s.favorite, theme:s.theme, lang:s.lang}));
-    setMaxStep(3);
-    flash(tr(mode==='random'?'toastRandom':'toastSim'));
-    setStep('results');
-  };
-  const doRandom = ()=>applySimulation('random');
-  const doSim    = ()=>applySimulation('sim');
+  const doRandom = ()=>{ setState(simulate('random')); setMaxStep(3); flash(tr('toastRandom')); setStep('results'); };
+  const doSim    = ()=>{ setState(simulate('sim'));    setMaxStep(3); flash(tr('toastSim')); setStep('results'); };
   const doReset  = ()=>{ setState({...defaultState(), lang:state.lang, theme:state.theme}); setMaxStep(0); flash(tr('toastReset')); setStep('groups'); };
 
   const doShare = async ()=>{
@@ -1275,7 +1301,7 @@ function App(){
       {/* BODY */}
       <main className="max-w-6xl mx-auto px-4 py-6">
         {step==='groups'   && <GroupStage state={state} setStandings={setStandings} setGroupScore={setGroupScore} clearGroupScores={clearGroupScores} />}
-        {step==='thirds'   && <ThirdPlace state={state} setThirdRanking={setThirdRanking} favorite={state.favorite} />}
+        {step==='thirds'   && <ThirdPlace state={state} setThirdRanking={setThirdRanking} autoRankThirds={autoRankThirds} favorite={state.favorite} />}
         {step==='knockout' && <Knockout resolved={resolved} onPick={onPick} favorite={state.favorite} />}
         {step==='results'  && <Results resolved={resolved} favorite={state.favorite} />}
       </main>
