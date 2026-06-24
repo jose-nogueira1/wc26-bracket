@@ -57,12 +57,16 @@
 
 <!-- Favicon: original WC26 trophy crest (SVG, no external file) -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff2e88'/%3E%3Cstop offset='.4' stop-color='%23a855f7'/%3E%3Cstop offset='.7' stop-color='%2336a3ff'/%3E%3Cstop offset='1' stop-color='%232bd9c4'/%3E%3C/linearGradient%3E%3ClinearGradient id='gold' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ffe27a'/%3E%3Cstop offset='1' stop-color='%23ffb300'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='10' fill='%230a0a16'/%3E%3Ccircle cx='24' cy='23' r='17' fill='none' stroke='url(%23g)' stroke-width='2.5'/%3E%3Cpath d='M18 12h12v4c0 4.5-2.7 7-6 7s-6-2.5-6-7v-4z' fill='url(%23gold)'/%3E%3Crect x='22.5' y='23' width='3' height='4' fill='url(%23gold)'/%3E%3Crect x='19' y='27' width='10' height='2.5' rx='1.2' fill='url(%23gold)'/%3E%3Ctext x='24' y='41' text-anchor='middle' font-size='8' font-weight='900' fill='%23fff' font-family='Arial'%3E26%3C/text%3E%3C/svg%3E" />
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
   tailwind.config = {
     darkMode: 'class',
@@ -115,6 +119,47 @@
   .bk-conn{position:absolute;inset:0;pointer-events:none;overflow:visible}
   .locked{opacity:.45;cursor:not-allowed}
   .export-sheet{position:fixed;left:-99999px;top:0}
+  :focus-visible{outline:2px solid var(--c3);outline-offset:2px;border-radius:6px}
+  button:focus:not(:focus-visible){outline:none}
+  /* ---------- LIGHT MODE ---------- */
+  html.light{color-scheme:light}
+  html.light body{background:#eef1f8;color:#15162b}
+  html.light .pitch-bg{background:
+     radial-gradient(900px 420px at 8% -8%, rgba(var(--g1),.10), transparent 60%),
+     radial-gradient(900px 420px at 92% -6%, rgba(var(--g2),.10), transparent 60%),
+     radial-gradient(1100px 600px at 50% 110%, rgba(var(--g3),.08), transparent 60%),
+     repeating-linear-gradient(180deg,#eef1f8 0px,#eef1f8 38px,#e7eaf4 38px,#e7eaf4 76px)}
+  html.light .glass{background:rgba(255,255,255,.74);border-color:rgba(20,20,60,.10)}
+  html.light .bk-card{background:rgba(255,255,255,.94);border-color:rgba(20,20,60,.14)}
+  html.light .bk-team.tbd{color:rgba(20,20,60,.4)}
+  html.light .bk-team:hover{background:rgba(255,46,136,.12)}
+  html.light .scrollbar,html.light *{scrollbar-color:#ff2e88 #d9deec}
+  html.light .bg-pitch-950\/70{background:rgba(244,246,251,.82)!important}
+  html.light .bg-pitch-900\/90{background:rgba(244,246,251,.92)!important}
+  html.light .bg-pitch-950{background:#eef1f8!important}
+  html.light .bg-pitch-900{background:#e7eaf4!important}
+  html.light .bg-black\/20{background:rgba(20,20,60,.05)!important}
+  html.light .text-white{color:#15162b!important}
+  html.light .text-white\/80{color:rgba(21,22,43,.82)!important}
+  html.light .text-white\/75{color:rgba(21,22,43,.78)!important}
+  html.light .text-white\/70{color:rgba(21,22,43,.72)!important}
+  html.light .text-white\/60{color:rgba(21,22,43,.64)!important}
+  html.light .text-white\/55{color:rgba(21,22,43,.60)!important}
+  html.light .text-white\/50{color:rgba(21,22,43,.56)!important}
+  html.light .text-white\/45{color:rgba(21,22,43,.54)!important}
+  html.light .text-white\/40{color:rgba(21,22,43,.50)!important}
+  html.light .text-white\/35{color:rgba(21,22,43,.46)!important}
+  html.light .text-white\/30{color:rgba(21,22,43,.42)!important}
+  html.light .text-white\/25{color:rgba(21,22,43,.38)!important}
+  html.light .text-white\/20{color:rgba(21,22,43,.34)!important}
+  html.light .text-white\/15{color:rgba(21,22,43,.28)!important}
+  html.light .bg-white\/5{background:rgba(20,20,60,.05)!important}
+  html.light .bg-white\/10{background:rgba(20,20,60,.09)!important}
+  html.light .border-white\/5{border-color:rgba(20,20,60,.07)!important}
+  html.light .border-white\/10{border-color:rgba(20,20,60,.11)!important}
+  html.light .border-white\/15{border-color:rgba(20,20,60,.15)!important}
+  html.light .border-white\/20{border-color:rgba(20,20,60,.20)!important}
+  html.light .border-white\/50{border-color:rgba(20,20,60,.42)!important}
 </style>
 </head>
 <body>
@@ -230,6 +275,11 @@ const I18N = {
     compare:'Compare', compareTitle:'Compare with a friend', comparePaste:'Paste a friend’s share link…', compareBtn:'Compare', compareInvalid:'That isn’t a valid bracket link.', agreement:'agreement', you:'You', them:'Friend',
     dnaTitle:'Bracket DNA', dnaBoldness:'Boldness', dnaOdds:'Exact bracket odds', dnaChampOdds:'Champion odds', dnaChampLine:'{team} lifts the cup in {pct} of simulations', oneIn:'1 in {n}', analysing:'Analysing your bracket…', upsetsCount:'{n} upsets picked',
     bold0:'Chalk merchant 📋', bold1:'Plays it safe 🛡️', bold2:'Calculated gambler 🎯', bold3:'Upset hunter 🔥', bold4:'Chaos agent 🃏', replay:'Replay 🎉',
+    btnStory:'Story', qrScan:'Scan to open this bracket',
+    btnBrackets:'Brackets', savedTitle:'My brackets', saveNamePh:'Name this bracket…', saveBtn:'Save', loadBtn:'Load', deleteBtn:'Delete', noSaved:'No saved brackets yet — save your current one above.', savedToast:'💾 Bracket saved', unnamed:'Untitled',
+    penalties:'Penalties:', advancesOnPens:'advances on pens',
+    darkHorse:'Dark horse', modeToLight:'Light mode', modeToDark:'Dark mode',
+    onbTitle:'Welcome! 👋', onb1:'Set each group — drag teams or enter the 6 scorelines.', onb2:'The best third-placed teams are ranked automatically by points & goal difference.', onb3:'Pick knockout winners by tapping a team, or predict the scoreline (draws go to penalties).', onb4:'Get title odds, compare with friends, install the app, and export your bracket as an image.', onbGo:'Let’s go',
   },
   pt:{
     brandSub:'Simulador de Chaves',
@@ -270,6 +320,12 @@ const I18N = {
     compare:'Comparar', compareTitle:'Comparar com um amigo', comparePaste:'Cola o link de partilha de um amigo…', compareBtn:'Comparar', compareInvalid:'Esse link de chave não é válido.', agreement:'de acordo', you:'Tu', them:'Amigo',
     dnaTitle:'ADN da Chave', dnaBoldness:'Ousadia', dnaOdds:'Probabilidade exata', dnaChampOdds:'Hipóteses do campeão', dnaChampLine:'{team} ergue a taça em {pct} das simulações', oneIn:'1 em {n}', analysing:'A analisar a tua chave…', upsetsCount:'{n} surpresas escolhidas',
     bold0:'Sempre o favorito 📋', bold1:'Joga seguro 🛡️', bold2:'Apostador calculista 🎯', bold3:'Caçador de surpresas 🔥', bold4:'Agente do caos 🃏', replay:'Repetir 🎉',
+    btnStory:'Story', qrScan:'Lê para abrir esta chave',
+    btnBrackets:'Chaves', savedTitle:'As minhas chaves', saveNamePh:'Dá um nome a esta chave…', saveBtn:'Guardar', loadBtn:'Abrir', deleteBtn:'Apagar', noSaved:'Ainda não há chaves guardadas — guarda a atual acima.', savedToast:'💾 Chave guardada', unnamed:'Sem título',
+    penalties:'Penáltis:', advancesOnPens:'avança nos penáltis',
+    darkHorse:'Surpresa', modeToLight:'Modo claro', modeToDark:'Modo escuro',
+    onbTitle:'Bem-vindo! 👋', onb1:'Define cada grupo — arrasta as equipas ou insere os 6 resultados.', onb2:'Os melhores terceiros são ordenados automaticamente por pontos e diferença de golos.', onb3:'Escolhe os vencedores tocando numa equipa, ou prevê o resultado (empates vão a penáltis).', onb4:'Vê probabilidades, compara com amigos, instala a app e exporta a tua chave como imagem.', onbGo:'Vamos',
+    teams:{ MEX:'México', RSA:'África do Sul', KOR:'Coreia do Sul', CZE:'Chéquia', CAN:'Canadá', BIH:'Bósnia e Herzegovina', QAT:'Catar', SUI:'Suíça', BRA:'Brasil', MAR:'Marrocos', HAI:'Haiti', SCO:'Escócia', USA:'EUA', PAR:'Paraguai', AUS:'Austrália', TUR:'Turquia', GER:'Alemanha', CUW:'Curaçao', CIV:'Costa do Marfim', ECU:'Equador', NED:'Países Baixos', JPN:'Japão', SWE:'Suécia', TUN:'Tunísia', BEL:'Bélgica', EGY:'Egito', IRN:'Irão', NZL:'Nova Zelândia', ESP:'Espanha', CPV:'Cabo Verde', KSA:'Arábia Saudita', URU:'Uruguai', FRA:'França', SEN:'Senegal', IRQ:'Iraque', NOR:'Noruega', ARG:'Argentina', ALG:'Argélia', AUT:'Áustria', JOR:'Jordânia', POR:'Portugal', COD:'RD Congo', UZB:'Usbequistão', COL:'Colômbia', ENG:'Inglaterra', CRO:'Croácia', GHA:'Gana', PAN:'Panamá' },
   },
   fr:{
     brandSub:'Pronostics du tableau',
@@ -310,6 +366,12 @@ const I18N = {
     compare:'Comparer', compareTitle:'Comparer avec un ami', comparePaste:'Collez le lien de partage d’un ami…', compareBtn:'Comparer', compareInvalid:'Ce lien de tableau n’est pas valide.', agreement:'d’accord', you:'Vous', them:'Ami',
     dnaTitle:'ADN du Tableau', dnaBoldness:'Audace', dnaOdds:'Probabilité exacte', dnaChampOdds:'Chances du champion', dnaChampLine:'{team} soulève le trophée dans {pct} des simulations', oneIn:'1 sur {n}', analysing:'Analyse de votre tableau…', upsetsCount:'{n} surprises choisies',
     bold0:'Toujours le favori 📋', bold1:'Joue la sécurité 🛡️', bold2:'Parieur calculateur 🎯', bold3:'Chasseur de surprises 🔥', bold4:'Agent du chaos 🃏', replay:'Rejouer 🎉',
+    btnStory:'Story', qrScan:'Scannez pour ouvrir ce tableau',
+    btnBrackets:'Tableaux', savedTitle:'Mes tableaux', saveNamePh:'Nommez ce tableau…', saveBtn:'Enregistrer', loadBtn:'Ouvrir', deleteBtn:'Supprimer', noSaved:'Aucun tableau enregistré — enregistrez le tableau actuel ci-dessus.', savedToast:'💾 Tableau enregistré', unnamed:'Sans titre',
+    penalties:'Tirs au but :', advancesOnPens:'se qualifie aux t.a.b.',
+    darkHorse:'Outsider', modeToLight:'Mode clair', modeToDark:'Mode sombre',
+    onbTitle:'Bienvenue ! 👋', onb1:'Réglez chaque groupe — glissez les équipes ou saisissez les 6 scores.', onb2:'Les meilleurs troisièmes sont classés automatiquement (points puis différence de buts).', onb3:'Choisissez les vainqueurs en touchant une équipe, ou prédisez le score (nuls aux t.a.b.).', onb4:'Cotes du titre, comparaison entre amis, installation de l’app et export du tableau en image.', onbGo:'C’est parti',
+    teams:{ MEX:'Mexique', RSA:'Afrique du Sud', KOR:'Corée du Sud', CZE:'Tchéquie', CAN:'Canada', BIH:'Bosnie-Herzégovine', QAT:'Qatar', SUI:'Suisse', BRA:'Brésil', MAR:'Maroc', HAI:'Haïti', SCO:'Écosse', USA:'États-Unis', PAR:'Paraguay', AUS:'Australie', TUR:'Turquie', GER:'Allemagne', CUW:'Curaçao', CIV:"Côte d'Ivoire", ECU:'Équateur', NED:'Pays-Bas', JPN:'Japon', SWE:'Suède', TUN:'Tunisie', BEL:'Belgique', EGY:'Égypte', IRN:'Iran', NZL:'Nouvelle-Zélande', ESP:'Espagne', CPV:'Cap-Vert', KSA:'Arabie saoudite', URU:'Uruguay', FRA:'France', SEN:'Sénégal', IRQ:'Irak', NOR:'Norvège', ARG:'Argentine', ALG:'Algérie', AUT:'Autriche', JOR:'Jordanie', POR:'Portugal', COD:'RD Congo', UZB:'Ouzbékistan', COL:'Colombie', ENG:'Angleterre', CRO:'Croatie', GHA:'Ghana', PAN:'Panama' },
   },
   es:{
     brandSub:'Predictor de llaves',
@@ -350,6 +412,12 @@ const I18N = {
     compare:'Comparar', compareTitle:'Comparar con un amigo', comparePaste:'Pega el enlace de un amigo…', compareBtn:'Comparar', compareInvalid:'Ese enlace de cuadro no es válido.', agreement:'de acuerdo', you:'Tú', them:'Amigo',
     dnaTitle:'ADN del Cuadro', dnaBoldness:'Audacia', dnaOdds:'Probabilidad exacta', dnaChampOdds:'Opciones del campeón', dnaChampLine:'{team} levanta la copa en {pct} de las simulaciones', oneIn:'1 entre {n}', analysing:'Analizando tu cuadro…', upsetsCount:'{n} sorpresas elegidas',
     bold0:'Siempre el favorito 📋', bold1:'Juega seguro 🛡️', bold2:'Apostador calculador 🎯', bold3:'Cazador de sorpresas 🔥', bold4:'Agente del caos 🃏', replay:'Repetir 🎉',
+    btnStory:'Historia', qrScan:'Escanea para abrir este cuadro',
+    btnBrackets:'Cuadros', savedTitle:'Mis cuadros', saveNamePh:'Nombra este cuadro…', saveBtn:'Guardar', loadBtn:'Abrir', deleteBtn:'Eliminar', noSaved:'Aún no hay cuadros guardados — guarda el actual arriba.', savedToast:'💾 Cuadro guardado', unnamed:'Sin título',
+    penalties:'Penales:', advancesOnPens:'avanza en penales',
+    darkHorse:'Tapado', modeToLight:'Modo claro', modeToDark:'Modo oscuro',
+    onbTitle:'¡Bienvenido! 👋', onb1:'Define cada grupo — arrastra los equipos o introduce los 6 resultados.', onb2:'Los mejores terceros se ordenan automáticamente por puntos y diferencia de goles.', onb3:'Elige a los ganadores tocando un equipo, o predice el resultado (empates a penales).', onb4:'Mira las cuotas, compara con amigos, instala la app y exporta tu cuadro como imagen.', onbGo:'Vamos',
+    teams:{ MEX:'México', RSA:'Sudáfrica', KOR:'Corea del Sur', CZE:'Chequia', CAN:'Canadá', BIH:'Bosnia y Herzegovina', QAT:'Catar', SUI:'Suiza', BRA:'Brasil', MAR:'Marruecos', HAI:'Haití', SCO:'Escocia', USA:'EE. UU.', PAR:'Paraguay', AUS:'Australia', TUR:'Turquía', GER:'Alemania', CUW:'Curazao', CIV:'Costa de Marfil', ECU:'Ecuador', NED:'Países Bajos', JPN:'Japón', SWE:'Suecia', TUN:'Túnez', BEL:'Bélgica', EGY:'Egipto', IRN:'Irán', NZL:'Nueva Zelanda', ESP:'España', CPV:'Cabo Verde', KSA:'Arabia Saudí', URU:'Uruguay', FRA:'Francia', SEN:'Senegal', IRQ:'Irak', NOR:'Noruega', ARG:'Argentina', ALG:'Argelia', AUT:'Austria', JOR:'Jordania', POR:'Portugal', COD:'RD Congo', UZB:'Uzbekistán', COL:'Colombia', ENG:'Inglaterra', CRO:'Croacia', GHA:'Ghana', PAN:'Panamá' },
   },
 };
 function tr(key, vars){
@@ -358,6 +426,8 @@ function tr(key, vars){
   return s;
 }
 const roundLabel = key => tr('round'+key);
+// Localized country name (falls back to the English name in TEAMS).
+function tName(code){ const L=I18N[LANG]; const t=L&&L.teams&&L.teams[code]; if(t) return t; const e=TEAMS[code]; return e?e.name:code; }
 
 // Round of 32 — sources: {t:'w'|'ru', g:Group}  or  {t:'3', combo:'eligible groups'}
 const R32 = [
@@ -480,6 +550,9 @@ const THEMES = {
   magenta:{ label:'Spectrum', c:['#ff2e88','#a855f7','#36a3ff','#2bd9c4','#ffd23f'], glow:['255,46,136','54,163,255','168,85,247'] },
   ocean:  { label:'Ocean',    c:['#22d3ee','#38bdf8','#6366f1','#2dd4bf','#a3e635'], glow:['56,189,248','45,212,191','99,102,241'] },
   sunset: { label:'Sunset',   c:['#fb7185','#fb923c','#f59e0b','#ef4444','#a855f7'], glow:['251,113,133','251,146,60','168,85,247'] },
+  pitch:  { label:'Pitch',    c:['#22c55e','#10b981','#2bd9c4','#84cc16','#fde047'], glow:['34,197,94','45,212,191','132,204,22'] },
+  royal:  { label:'Royal',    c:['#a855f7','#7c3aed','#ec4899','#f59e0b','#fde047'], glow:['168,85,247','236,72,153','245,158,11'] },
+  ember:  { label:'Ember',    c:['#ef4444','#f43f5e','#fb7185','#f59e0b','#fbbf24'], glow:['239,68,68','244,63,94','245,158,11'] },
 };
 
 const defaultState = () => ({
@@ -487,12 +560,15 @@ const defaultState = () => ({
   thirdRanking: [...GROUP_LETTERS],        // ranking of the 12 groups' third teams
   picks: {},                               // matchId -> winning team code
   groupScores: {},                         // group -> fixtureIndex -> {h,a}
+  scores: {},                              // knockout matchId -> {h, a, pen:'home'|'away'}
   favorite: null,                          // favourite team code
+  darkHorse: null,                         // dark-horse (second) team code
   theme: 'magenta',
+  mode: 'dark',                            // 'dark' | 'light'
   lang: 'en',
   creator: '',                             // name shown on exported PNG/PDF
 });
-const normalize = s => ({ groupScores:{}, favorite:null, theme:'magenta', lang:'en', creator:'', ...s });
+const normalize = s => ({ groupScores:{}, scores:{}, favorite:null, darkHorse:null, theme:'magenta', mode:'dark', lang:'en', creator:'', ...s });
 
 function encodeState(s){
   try { return btoa(unescape(encodeURIComponent(JSON.stringify(s)))); } catch(e){ return ''; }
@@ -627,10 +703,12 @@ const Pill = ({children,tone='neon'}) => {
 /* ============================================================
    GROUP STAGE
    ============================================================ */
-function GroupCard({letter, order, scores, played, computed, onReorder, onScore, onClear, favorite}){
+function GroupCard({letter, order, scores, played, computed, onReorder, onScore, onClear, favorite, darkHorse}){
   const [edit,setEdit]=useState(false);
   const teams=GROUPS[letter];
   const fav = code => favorite===code;
+  const ring = code => favorite===code?' ring-1 ring-gold/70':darkHorse===code?' ring-1 ring-electric/70':'';
+  const mark = code => favorite===code?<span className="text-gold"> ★</span>:darkHorse===code?<span className="text-electric"> ◆</span>:null;
   return (
     <div className="glass rounded-2xl p-3 slidein">
       <div className="flex items-center justify-between mb-2">
@@ -646,10 +724,10 @@ function GroupCard({letter, order, scores, played, computed, onReorder, onScore,
             const qual=i<2,third=i===2;
             return (
               <div key={r.code} className={'flex items-center gap-2 rounded-lg px-2 py-1.5 border '
-                +(qual?'bg-neon/10 border-neon/30':third?'bg-amber-400/10 border-amber-400/25':'bg-white/[.03] border-white/5')+(fav(r.code)?' ring-1 ring-gold/70':'')}>
+                +(qual?'bg-neon/10 border-neon/30':third?'bg-amber-400/10 border-amber-400/25':'bg-white/[.03] border-white/5')+ring(r.code)}>
                 <span className={'w-5 h-5 grid place-items-center rounded-md text-[11px] font-bold '+(qual?'bg-neon text-pitch-950':third?'bg-amber-400 text-pitch-950':'bg-white/10 text-white/50')}>{i+1}</span>
                 <Flag code={r.code} cls="text-base" />
-                <span className="text-sm font-medium truncate flex-1">{TEAMS[r.code].name}{fav(r.code)&&<span className="text-gold"> ★</span>}</span>
+                <span className="text-sm font-medium truncate flex-1">{tName(r.code)}{mark(r.code)}</span>
                 <span className="text-[10px] text-white/40 tabular-nums">{r.W}-{r.D}-{r.L}</span>
                 <span className="text-[10px] text-white/35 w-7 text-right tabular-nums">{r.GD>0?'+'+r.GD:r.GD}</span>
                 <span className="text-xs font-bold w-5 text-right">{r.Pts}</span>
@@ -664,11 +742,11 @@ function GroupCard({letter, order, scores, played, computed, onReorder, onScore,
               const qual = it.pos<2, third = it.pos===2;
               return (
                 <div className={'flex items-center gap-2 rounded-xl px-2.5 py-2 cursor-grab active:cursor-grabbing border transition '
-                  +(qual?'bg-neon/10 border-neon/30':third?'bg-amber-400/10 border-amber-400/25':'bg-white/[.03] border-white/5')+(fav(it.code)?' ring-1 ring-gold/70':'')}>
+                  +(qual?'bg-neon/10 border-neon/30':third?'bg-amber-400/10 border-amber-400/25':'bg-white/[.03] border-white/5')+ring(it.code)}>
                   <span className={'w-5 h-5 grid place-items-center rounded-md text-[11px] font-bold '
                     +(qual?'bg-neon text-pitch-950':third?'bg-amber-400 text-pitch-950':'bg-white/10 text-white/50')}>{it.pos+1}</span>
                   <Flag code={it.code} cls="text-lg" />
-                  <span className="text-sm font-medium truncate flex-1">{TEAMS[it.code].name}{fav(it.code)&&<span className="text-gold"> ★</span>}</span>
+                  <span className="text-sm font-medium truncate flex-1">{tName(it.code)}{mark(it.code)}</span>
                   {qual && <Pill>{tr('qual')}</Pill>}
                   {third && <Pill tone="muted">{tr('third')}</Pill>}
                   <span className="text-white/20 text-xs">⠿</span>
@@ -689,9 +767,9 @@ function GroupCard({letter, order, scores, played, computed, onReorder, onScore,
                 className="w-8 text-center bg-white/5 border border-white/10 rounded py-0.5 text-xs font-bold focus:border-neon/60 outline-none" />;
               return (
                 <div key={i} className="flex items-center gap-1.5 text-xs">
-                  <span className="flex-1 text-right truncate">{TEAMS[A].name} <Flag code={A}/></span>
+                  <span className="flex-1 text-right truncate">{tName(A)} <Flag code={A}/></span>
                   <Inp side="h" /><span className="text-white/30">–</span><Inp side="a" />
-                  <span className="flex-1 truncate"><Flag code={B}/> {TEAMS[B].name}</span>
+                  <span className="flex-1 truncate"><Flag code={B}/> {tName(B)}</span>
                 </div>
               );
             })}
@@ -712,7 +790,7 @@ function GroupStage({state, setStandings, setGroupScore, clearGroupScores}){
           const computed = computeGroup(g, GROUPS[g], state.groupScores[g]);
           return (
             <GroupCard key={g} letter={g} order={state.standings[g]} scores={state.groupScores[g]}
-              played={computed.played} computed={computed} favorite={state.favorite}
+              played={computed.played} computed={computed} favorite={state.favorite} darkHorse={state.darkHorse}
               onReorder={(l,o)=>setStandings(l,o)} onScore={setGroupScore} onClear={clearGroupScores} />
           );
         })}
@@ -724,7 +802,9 @@ function GroupStage({state, setStandings, setGroupScore, clearGroupScores}){
 /* ============================================================
    THIRD PLACE RANKING (drag & drop)
    ============================================================ */
-function ThirdPlace({state, setThirdRanking, autoRankThirds, favorite}){
+function ThirdPlace({state, setThirdRanking, autoRankThirds, favorite, darkHorse}){
+  const ring = code => favorite===code?' ring-1 ring-gold/70':darkHorse===code?' ring-1 ring-electric/70':'';
+  const mark = code => favorite===code?<span className="text-gold"> ★</span>:darkHorse===code?<span className="text-electric"> ◆</span>:null;
   const recByG = {}; thirdRecords(state.standings, state.groupScores).forEach(r=>recByG[r.g]=r);
   const anyPlayed = Object.values(recByG).some(r=>r.played);
   const items = state.thirdRanking.map((g,i)=>({key:g, g, code:state.standings[g][2], pos:i}));
@@ -742,11 +822,11 @@ function ThirdPlace({state, setThirdRanking, autoRankThirds, favorite}){
               const qual = it.pos<8, rec = recByG[it.g] || {Pts:0,GD:0,GF:0};
               return (
                 <div className={'flex items-center gap-2 sm:gap-3 rounded-xl px-3 py-2.5 cursor-grab active:cursor-grabbing border transition '
-                  +(qual?'bg-neon/10 border-neon/30':'bg-white/[.02] border-white/5 opacity-50')+(favorite===it.code?' ring-1 ring-gold/70':'')}>
+                  +(qual?'bg-neon/10 border-neon/30':'bg-white/[.02] border-white/5 opacity-50')+ring(it.code)}>
                   <span className={'w-6 h-6 grid place-items-center rounded-lg text-xs font-bold shrink-0 '
                     +(qual?'bg-neon text-pitch-950':'bg-white/10 text-white/40')}>{it.pos+1}</span>
                   <Flag code={it.code} cls="text-xl shrink-0" />
-                  <span className="text-sm font-semibold flex-1 truncate">{TEAMS[it.code].name}{favorite===it.code&&<span className="text-gold"> ★</span>}</span>
+                  <span className="text-sm font-semibold flex-1 truncate">{tName(it.code)}{mark(it.code)}</span>
                   {anyPlayed && <span className="text-[10px] text-white/45 tabular-nums hidden sm:inline">{rec.Pts} pts · {rec.GD>0?'+'+rec.GD:rec.GD} GD</span>}
                   <Pill tone="muted">{tr('groupOf',{g:it.g})}</Pill>
                   {qual ? <Pill>{tr('qualifies')}</Pill> : <span className="text-[10px] font-semibold text-red-400/80">{tr('eliminated')}</span>}
@@ -772,30 +852,58 @@ function TeamRow({code, isWinner, decided, onPick, thirdGroup}){
         +(decided&&isWinner?'bg-neon/15 ':'')
         +(decided&&!isWinner?'opacity-40 ':'')}>
       <Flag code={code} cls="text-lg" />
-      <span className="text-sm font-medium flex-1 truncate">{code?TEAMS[code].name:<span className="text-white/30 italic">{tr('tbd')}</span>}</span>
+      <span className="text-sm font-medium flex-1 truncate">{code?tName(code):<span className="text-white/30 italic">{tr('tbd')}</span>}</span>
       {thirdGroup && <Pill tone="muted">{tr('third')} {thirdGroup}</Pill>}
       {decided&&isWinner && <span className="text-neon text-xs">✓</span>}
     </button>
   );
 }
 
-function MatchCard({m, teams, winnerOf, onPick}){
-  const t = teams[m.id]; const w = winnerOf(m.id);
+function MatchCard({m, teams, winnerOf, scores, onPick, setScore, setPen}){
+  const id=m.id, t=teams[id]||{}, w=winnerOf(id);
+  const sc=scores[id]||{};
+  const draw = sc.h!=null && sc.a!=null && sc.h===sc.a;
+  const Score=({side})=>{ const key=side==='home'?'h':'a';
+    return <input type="number" min="0" inputMode="numeric" disabled={!t[side]} value={sc[key]??''}
+      onChange={e=>setScore(id,key,e.target.value===''?null:Math.max(0,parseInt(e.target.value)||0))}
+      className="w-9 text-center bg-white/5 border border-white/10 rounded py-1 text-sm font-bold focus:border-neon/60 outline-none disabled:opacity-30" />; };
+  const Row=({side})=>{ const code=t[side], win=w&&w===code, lose=w&&code&&w!==code;
+    return (
+      <div className={'flex items-center gap-2 px-3 py-2 '+(win?'bg-neon/10 ':'')+(lose?'opacity-45 ':'')}>
+        <button disabled={!code} onClick={code?()=>onPick(id,code):undefined} className="flex items-center gap-2 flex-1 text-left disabled:cursor-default min-w-0">
+          <Flag code={code} cls="text-lg" />
+          <span className="text-sm font-medium truncate flex-1">{code?tName(code):<span className="italic text-white/30">{tr('tbd')}</span>}</span>
+          {t.thirdGroup && side==='away' && <Pill tone="muted">{tr('third')} {t.thirdGroup}</Pill>}
+          {win && <span className="text-neon text-xs">✓</span>}
+        </button>
+        <Score side={side} />
+      </div>
+    );
+  };
   return (
-    <div className="glass rounded-xl overflow-hidden divide-y divide-white/5 slidein">
+    <div className="glass rounded-xl overflow-hidden slidein">
       <div className="flex items-center justify-between px-3 py-1 bg-black/20">
-        <span className="text-[10px] text-white/40 font-semibold">{tr('match')} {m.id}</span>
+        <span className="text-[10px] text-white/40 font-semibold">{tr('match')} {id}</span>
         {w && <span className="text-[10px] text-neon font-semibold pop">{tr('advances')}</span>}
       </div>
-      <TeamRow code={t.home} thirdGroup={t.thirdGroup} isWinner={w===t.home} decided={!!w}
-        onPick={t.home?()=>onPick(m.id, t.home):null} />
-      <TeamRow code={t.away} isWinner={w===t.away} decided={!!w}
-        onPick={t.away?()=>onPick(m.id, t.away):null} />
+      <div className="divide-y divide-white/5"><Row side="home" /><Row side="away" /></div>
+      {draw && t.home && t.away && (
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-black/20 text-[11px] flex-wrap">
+          <span className="text-white/45 font-semibold">{tr('penalties')}</span>
+          {['home','away'].map(side=>(
+            <button key={side} onClick={()=>setPen(id,side)}
+              className={'px-2 py-0.5 rounded-full border font-semibold transition '+(sc.pen===side?'bg-neon text-pitch-950 border-neon':'border-white/15 text-white/60 hover:border-neon/40')}>
+              {TEAMS[t[side]].flag} {t[side]}
+            </button>
+          ))}
+          <span className="text-white/30">{tr('advancesOnPens')}</span>
+        </div>
+      )}
     </div>
   );
 }
 
-function KnockoutList({resolved, onPick}){
+function KnockoutList({resolved, onPick, scores, setScore, setPen}){
   const rounds = [
     {key:'R32', list:R32},
     ...['R16','QF','SF'].map(r=>({key:r, list:LATER.filter(m=>m.round===r)})),
@@ -820,7 +928,8 @@ function KnockoutList({resolved, onPick}){
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {rounds.find(r=>r.key===active).list.map(m=>(
-          <MatchCard key={m.id} m={m} teams={resolved.teams} winnerOf={resolved.winnerOf} onPick={onPick} />
+          <MatchCard key={m.id} m={m} teams={resolved.teams} winnerOf={resolved.winnerOf}
+            scores={scores} onPick={onPick} setScore={setScore} setPen={setPen} />
         ))}
       </div>
     </div>
@@ -868,34 +977,39 @@ const BK = (()=>{
   return {layout, connectors, allIds, cardW, cardH, totalW};
 })();
 
-function BracketMatch({id, teams, winnerOf, onPick, pos, favorite}){
+function BracketMatch({id, teams, winnerOf, onPick, pos, favorite, darkHorse, scores}){
   const t=teams[id]||{}, w=winnerOf(id), p=pos[id]; if(!p) return null;
+  const sc=(scores&&scores[id])||{};
   const label = id===104?tr('finalLabel') : id===103?tr('thirdPlaceLabel') : null;
   const hasFav = favorite && (t.home===favorite || t.away===favorite);
-  const row=(code)=>{
-    const win=w&&w===code, lose=w&&code&&w!==code, isFav=code&&code===favorite;
+  const hasDH = darkHorse && (t.home===darkHorse || t.away===darkHorse);
+  const row=(code,side)=>{
+    const win=w&&w===code, lose=w&&code&&w!==code, isFav=code&&code===favorite, isDH=code&&code===darkHorse;
+    const val = side==='home'?sc.h:sc.a;
     return <div className={'bk-team '+(!code?'tbd ':win?'win ':lose?'lose ':'')}
       onClick={code&&onPick?()=>onPick(id,code):undefined}
-      style={isFav?{boxShadow:'inset 3px 0 0 #ffd23f'}:undefined}>
+      style={isFav?{boxShadow:'inset 3px 0 0 #ffd23f'}:isDH?{boxShadow:'inset 3px 0 0 #36a3ff'}:undefined}>
       <span style={{fontSize:18,lineHeight:1}}>{code?TEAMS[code].flag:'🏳️'}</span>
-      <span className="bk-code">{code||tr('tbd')}</span>
-      {isFav && <span style={{marginLeft:'auto',color:'#ffd23f',fontSize:12}}>★</span>}
+      <span className="bk-code" style={{flex:1,minWidth:0}}>{code||tr('tbd')}</span>
+      {val!=null && <span style={{fontSize:14,fontWeight:800,opacity:.9}}>{val}</span>}
+      {isFav && <span style={{color:'#ffd23f',fontSize:12,marginLeft:val!=null?6:'auto'}}>★</span>}
+      {isDH && <span style={{color:'#36a3ff',fontSize:12,marginLeft:val!=null?6:'auto'}}>◆</span>}
     </div>;
   };
   return (
     <div className="bk-card" style={{left:p.x, top:p.y, width:BK.cardW,
-        boxShadow: id===104?'0 0 22px rgba(255,210,63,.35)':hasFav?'0 0 0 1.5px rgba(255,210,63,.6)':'none',
+        boxShadow: id===104?'0 0 22px rgba(255,210,63,.35)':hasFav?'0 0 0 1.5px rgba(255,210,63,.6)':hasDH?'0 0 0 1.5px rgba(54,163,255,.6)':'none',
         borderColor: id===104?'rgba(255,210,63,.5)':undefined}}>
       {label && <div className="text-center text-[8px] font-bold tracking-widest py-0.5"
           style={{color:id===104?'#ffd23f':'#9aa0c0',background:'rgba(0,0,0,.3)'}}>{label}</div>}
-      {row(t.home)}
+      {row(t.home,'home')}
       <div style={{height:1,background:'rgba(255,255,255,.08)'}}/>
-      {row(t.away)}
+      {row(t.away,'away')}
     </div>
   );
 }
 
-function Bracket({resolved, onPick, fixedScale, favorite}){
+function Bracket({resolved, onPick, fixedScale, favorite, darkHorse, scores}){
   const {pos,totalW,height}=useMemo(()=>BK.layout(),[]);
   const segs=useMemo(()=>BK.connectors(pos),[pos]);
   const wrapRef=useRef(); const [scale,setScale]=useState(fixedScale||1);
@@ -913,7 +1027,7 @@ function Bracket({resolved, onPick, fixedScale, favorite}){
             {segs.map((d,i)=><path key={i} d={d} fill="none" stroke="rgba(255,46,136,.5)" strokeWidth="2"/>)}
           </svg>
           {BK.allIds.map(id=>(
-            <BracketMatch key={id} id={id} teams={resolved.teams} winnerOf={resolved.winnerOf} onPick={onPick} pos={pos} favorite={favorite} />
+            <BracketMatch key={id} id={id} teams={resolved.teams} winnerOf={resolved.winnerOf} onPick={onPick} pos={pos} favorite={favorite} darkHorse={darkHorse} scores={scores} />
           ))}
         </div>
       </div>
@@ -921,7 +1035,7 @@ function Bracket({resolved, onPick, fixedScale, favorite}){
   );
 }
 
-function Knockout({resolved, onPick, favorite}){
+function Knockout({resolved, onPick, favorite, darkHorse, scores, setScore, setPen}){
   const [view,setView]=useState('bracket');
   const decided = R32.length + LATER.length;
   const done = [...R32,...LATER].filter(m=>resolved.winnerOf(m.id)).length;
@@ -942,11 +1056,11 @@ function Knockout({resolved, onPick, favorite}){
       {view==='bracket' ? (
         <div style={{width:'100vw', position:'relative', left:'50%', marginLeft:'-50vw', paddingLeft:'12px', paddingRight:'12px'}}>
           <div className="glass rounded-2xl p-3 sm:p-4">
-            <Bracket resolved={resolved} onPick={onPick} favorite={favorite} />
+            <Bracket resolved={resolved} onPick={onPick} favorite={favorite} darkHorse={darkHorse} scores={scores} />
             <p className="text-center text-[11px] text-white/35 mt-2">{tr('bracketHint')}</p>
           </div>
         </div>
-      ) : <KnockoutList resolved={resolved} onPick={onPick} />}
+      ) : <KnockoutList resolved={resolved} onPick={onPick} scores={scores} setScore={setScore} setPen={setPen} />}
     </div>
   );
 }
@@ -966,7 +1080,7 @@ function GroupMini({letter, order}){
             background:i<2?'rgba(255,46,136,.15)':i===2?'rgba(255,210,63,.12)':'rgba(255,255,255,.05)'}}>
           <span style={{display:'inline-block', width:16, textAlign:'center', fontSize:12, fontWeight:800, verticalAlign:'middle', color:i<2?'#ff6aa9':i===2?'#ffd23f':'#7b8099'}}>{i+1}</span>
           <span style={{display:'inline-block', fontSize:18, verticalAlign:'middle', margin:'0 8px 0 5px'}}>{TEAMS[code].flag}</span>
-          <span style={{display:'inline-block', fontSize:15, fontWeight:600, lineHeight:'normal', verticalAlign:'middle', maxWidth:262, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{TEAMS[code].name}</span>
+          <span style={{display:'inline-block', fontSize:15, fontWeight:600, lineHeight:'normal', verticalAlign:'middle', maxWidth:262, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{tName(code)}</span>
         </div>
       ))}
     </div>
@@ -996,8 +1110,8 @@ const ExportSheet = React.forwardRef(({state, resolved}, ref)=>{
           {champion && (
             <div style={{textAlign:'right'}}>
               <div style={{fontSize:13,fontWeight:800,letterSpacing:'.2em',color:'#ffd23f'}}>{tr('exportChamp')}</div>
-              <div style={{fontSize:32,fontWeight:900}}>{TEAMS[champion].flag} {TEAMS[champion].name}</div>
-              <div style={{fontSize:14,color:'#9aa0c0',marginTop:2}}>2.º {runnerUp?TEAMS[runnerUp].name:'—'} · 3.º {third?TEAMS[third].name:'—'}</div>
+              <div style={{fontSize:32,fontWeight:900}}>{TEAMS[champion].flag} {tName(champion)}</div>
+              <div style={{fontSize:14,color:'#9aa0c0',marginTop:2}}>2.º {runnerUp?tName(runnerUp):'—'} · 3.º {third?tName(third):'—'}</div>
             </div>
           )}
         </div>
@@ -1021,7 +1135,7 @@ function Podium({code, place}){
     <div className="flex flex-col items-center justify-end">
       <div className={'text-center mb-2 '+(code?'pop':'opacity-30')}>
         <div className={meta.z}>{code?TEAMS[code].flag:'🏳️'}</div>
-        <div className="text-sm font-bold mt-1">{code?TEAMS[code].name:'—'}</div>
+        <div className="text-sm font-bold mt-1">{code?tName(code):'—'}</div>
       </div>
       <div className={'w-24 sm:w-28 '+meta.h+' rounded-t-xl glass grid place-items-center'} style={{borderColor:meta.c+'66'}}>
         <div className="text-center">
@@ -1033,9 +1147,10 @@ function Podium({code, place}){
   );
 }
 
-function Results({resolved, favorite, themeKey}){
+function Results({resolved, favorite, darkHorse, themeKey}){
   const {champion, runnerUp, third} = resolved;
-  const favFinish = favorite ? (favorite===champion?tr('favWon'):favorite===runnerUp?tr('favRunner'):favorite===third?tr('favThird'):null) : null;
+  const finishOf = code => code===champion?tr('favWon'):code===runnerUp?tr('favRunner'):code===third?tr('favThird'):null;
+  const favFinish = favorite ? finishOf(favorite) : null;
   const [fire,setFire] = useState(0);
   useEffect(()=>{ if(champion) setFire(f=>f+1); }, [champion]);
   const confettiColors = ((THEMES[themeKey]||THEMES.magenta).c).concat('#ffd23f','#ffffff');
@@ -1047,7 +1162,7 @@ function Results({resolved, favorite, themeKey}){
         <div className="mb-8 slidein">
           <div className="text-xs tracking-[0.3em] text-gold/80 font-bold mb-1">{tr('worldChampions')}</div>
           <div className="text-6xl my-3 pop">{TEAMS[champion].flag}</div>
-          <div className="text-3xl font-black trophy-shine">{TEAMS[champion].name}</div>
+          <div className="text-3xl font-black trophy-shine">{tName(champion)}</div>
           <button onClick={()=>setFire(f=>f+1)} className="mt-3 text-xs glass rounded-full px-3 py-1 hover:border-neon/50 transition">{tr('replay')}</button>
         </div>
       ) : (
@@ -1060,11 +1175,18 @@ function Results({resolved, favorite, themeKey}){
         <Podium code={champion} place={1} />
         <Podium code={third} place={3} />
       </div>
-      {favorite && (
-        <div className="mt-6 inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm">
-          <span className="text-gold">★</span> {tr('yourFav')} <b>{TEAMS[favorite].flag} {TEAMS[favorite].name}</b> {favFinish || tr('favNone')}
-        </div>
-      )}
+      <div className="mt-6 flex flex-col items-center gap-2">
+        {favorite && (
+          <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm">
+            <span className="text-gold">★</span> {tr('yourFav')} <b>{TEAMS[favorite].flag} {tName(favorite)}</b> {favFinish || tr('favNone')}
+          </div>
+        )}
+        {darkHorse && (
+          <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm">
+            <span className="text-electric">◆</span> {tr('darkHorse')} <b>{TEAMS[darkHorse].flag} {tName(darkHorse)}</b> {finishOf(darkHorse) || tr('favNone')}
+          </div>
+        )}
+      </div>
       {champion && <DNAPanel resolved={resolved} themeKey={themeKey} />}
     </div>
   );
@@ -1149,14 +1271,14 @@ function OddsModal({onClose, favorite}){
   const [rows,setRows]=useState(null);
   useEffect(()=>{ const t=setTimeout(()=>{ try{ setRows(runOdds(4000)); }catch(e){ setRows([]); } }, 30); return ()=>clearTimeout(t); },[]);
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center p-3 overflow-auto" onClick={onClose}>
+    <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center p-3 overflow-auto" onClick={onClose}>
       <div className="glass rounded-2xl max-w-xl w-full p-4 my-6 slidein" onClick={e=>e.stopPropagation()}>
         <div className="flex items-start justify-between mb-3">
           <div>
             <h3 className="font-black text-lg">{tr('oddsTitle')}</h3>
             <p className="text-[11px] text-white/45">{tr('oddsSub')}</p>
           </div>
-          <button onClick={onClose} className="text-white/50 hover:text-white text-2xl leading-none px-1">×</button>
+          <button onClick={onClose} aria-label="Close" className="text-white/50 hover:text-white text-2xl leading-none px-1">×</button>
         </div>
         {!rows ? (
           <div className="py-16 text-center text-white/50"><div className="text-3xl mb-2 pop">🎲</div>{tr('oddsRunning')}</div>
@@ -1169,7 +1291,7 @@ function OddsModal({onClose, favorite}){
               <tbody>
                 {rows.filter(r=>r.R32>0.001).slice(0,32).map((r,i)=>(
                   <tr key={r.code} className={'border-t border-white/5 '+(favorite===r.code?'text-gold':'')}>
-                    <td className="py-1.5 pl-1 whitespace-nowrap"><span className="text-white/30 mr-1 tabular-nums">{i+1}</span><Flag code={r.code}/> <span className="font-semibold">{TEAMS[r.code].name}{favorite===r.code?' ★':''}</span></td>
+                    <td className="py-1.5 pl-1 whitespace-nowrap"><span className="text-white/30 mr-1 tabular-nums">{i+1}</span><Flag code={r.code}/> <span className="font-semibold">{tName(r.code)}{favorite===r.code?' ★':''}</span></td>
                     <td className="text-center px-2 font-bold text-neon">{pct(r.CHAMP)}</td>
                     <td className="text-center px-2 text-white/75">{pct(r.FINAL)}</td>
                     <td className="text-center px-2 text-white/55">{pct(r.SF)}</td>
@@ -1259,7 +1381,7 @@ function DNAPanel({resolved, themeKey}){
         <Stat label={tr('dnaBoldness')} value={tr('bold'+dna.tier)} sub={tr('upsetsCount',{n:dna.upsets})} />
         <Stat label={tr('dnaOdds')} value={tr('oneIn',{n:oddsOneIn(dna.logp)})} />
         <Stat label={tr('dnaChampOdds')} value={champOdds==null?'…':pct(champOdds)}
-          sub={resolved.champion?(champOdds==null?tr('analysing'):tr('dnaChampLine',{team:TEAMS[resolved.champion].name, pct:pct(champOdds)})):''} />
+          sub={resolved.champion?(champOdds==null?tr('analysing'):tr('dnaChampLine',{team:tName(resolved.champion), pct:pct(champOdds)})):''} />
       </div>
     </div>
   );
@@ -1278,13 +1400,13 @@ function CompareModal({onClose, mine}){
     ids.forEach(id=>{ const a=mine.winnerOf(id), b=rt.winnerOf(id); if(a&&b){ tot++; if(a===b)agree++; else dis.push({id,a,b}); } });
     setRes({rt, agree, tot, dis});
   };
-  const Line=({label,code})=> <div className="flex items-center gap-1.5 text-sm"><span className="text-white/45 w-12">{label}</span>{code?<><Flag code={code}/> <b>{TEAMS[code].name}</b></>:<span className="text-white/30">—</span>}</div>;
+  const Line=({label,code})=> <div className="flex items-center gap-1.5 text-sm"><span className="text-white/45 w-12">{label}</span>{code?<><Flag code={code}/> <b>{tName(code)}</b></>:<span className="text-white/30">—</span>}</div>;
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center p-3 overflow-auto" onClick={onClose}>
+    <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center p-3 overflow-auto" onClick={onClose}>
       <div className="glass rounded-2xl max-w-lg w-full p-4 my-6 slidein" onClick={e=>e.stopPropagation()}>
         <div className="flex items-start justify-between mb-3">
           <h3 className="font-black text-lg">🆚 {tr('compareTitle')}</h3>
-          <button onClick={onClose} className="text-white/50 hover:text-white text-2xl leading-none px-1">×</button>
+          <button onClick={onClose} aria-label="Close" className="text-white/50 hover:text-white text-2xl leading-none px-1">×</button>
         </div>
         <div className="flex gap-2">
           <input value={val} onChange={e=>setVal(e.target.value)} placeholder={tr('comparePaste')}
@@ -1308,15 +1430,84 @@ function CompareModal({onClose, mine}){
                 {res.dis.map(d=>(
                   <div key={d.id} className="flex items-center gap-2 text-xs glass rounded-lg px-2.5 py-1.5">
                     <span className="text-white/35 w-14 shrink-0">{tr('match')} {d.id}</span>
-                    <span className="flex-1 text-right truncate text-neon"><Flag code={d.a}/> {TEAMS[d.a].name}</span>
+                    <span className="flex-1 text-right truncate text-neon"><Flag code={d.a}/> {tName(d.a)}</span>
                     <span className="text-white/25">vs</span>
-                    <span className="flex-1 truncate text-electric">{TEAMS[d.b].name} <Flag code={d.b}/></span>
+                    <span className="flex-1 truncate text-electric">{tName(d.b)} <Flag code={d.b}/></span>
                   </div>
                 ))}
               </div>
             )}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Saved brackets (separate localStorage, not in the share URL) ---- */
+const SAVED_KEY='wc26-saved-v1';
+function loadSaved(){ try{ const r=localStorage.getItem(SAVED_KEY); const a=r?JSON.parse(r):[]; return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function persistSaved(list){ try{ localStorage.setItem(SAVED_KEY, JSON.stringify(list)); }catch(e){} }
+
+function SavedModal({onClose, current, onLoad, flash}){
+  const [list,setList]=useState(()=>loadSaved());
+  const [name,setName]=useState('');
+  const save=()=>{
+    let champ=null; try{ champ=resolveBracket(current).champion; }catch(e){}
+    const item={ id:'b'+Date.now(), name:(name.trim()||tr('unnamed')).slice(0,40), ts:Date.now(), champ, state:current };
+    const next=[item, ...list].slice(0,30); setList(next); persistSaved(next); setName(''); flash&&flash(tr('savedToast'));
+  };
+  const del=(id)=>{ const next=list.filter(x=>x.id!==id); setList(next); persistSaved(next); };
+  return (
+    <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center p-3 overflow-auto" onClick={onClose}>
+      <div className="glass rounded-2xl max-w-lg w-full p-4 my-6 slidein" onClick={e=>e.stopPropagation()}>
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="font-black text-lg">💾 {tr('savedTitle')}</h3>
+          <button onClick={onClose} aria-label="Close" className="text-white/50 hover:text-white text-2xl leading-none px-1">×</button>
+        </div>
+        <div className="flex gap-2 mb-4">
+          <input value={name} onChange={e=>setName(e.target.value)} maxLength={40} placeholder={tr('saveNamePh')}
+            onKeyDown={e=>{if(e.key==='Enter')save();}}
+            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-neon/50" />
+          <button onClick={save} className="px-3 py-2 rounded-lg spectrum text-pitch-950 font-bold text-sm">{tr('saveBtn')}</button>
+        </div>
+        {list.length===0 ? (
+          <p className="text-sm text-white/40 text-center py-6">{tr('noSaved')}</p>
+        ) : (
+          <div className="space-y-1.5 max-h-[60vh] overflow-y-auto">
+            {list.map(it=>(
+              <div key={it.id} className="flex items-center gap-2 glass rounded-xl px-3 py-2">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate">{it.name}</div>
+                  <div className="text-[11px] text-white/45">{it.champ?<>🏆 {TEAMS[it.champ]?.flag} {tName(it.champ)}</>:'—'} · {new Date(it.ts).toLocaleDateString()}</div>
+                </div>
+                <button onClick={()=>onLoad(it.state)} className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-neon/15 text-neon border border-neon/30 hover:bg-neon/25">{tr('loadBtn')}</button>
+                <button onClick={()=>del(it.id)} className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-white/10 text-white/50 hover:text-red-300 hover:border-red-400/30">{tr('deleteBtn')}</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function OnboardingModal({onClose}){
+  const items=[tr('onb1'),tr('onb2'),tr('onb3'),tr('onb4')];
+  return (
+    <div role="dialog" aria-modal="true" aria-label={tr('onbTitle')} className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3" onClick={onClose}>
+      <div className="glass rounded-2xl max-w-md w-full p-5 slidein text-center" onClick={e=>e.stopPropagation()}>
+        <div className="text-5xl mb-2">🏆</div>
+        <h2 className="font-black text-xl mb-4 spectrum-text">{tr('onbTitle')}</h2>
+        <ul className="text-left space-y-2.5 mb-5">
+          {items.map((it,i)=>(
+            <li key={i} className="flex gap-2.5 text-sm text-white/75">
+              <span className="w-5 h-5 shrink-0 grid place-items-center rounded-full bg-neon/15 text-neon text-[11px] font-bold">{i+1}</span>
+              <span>{it}</span>
+            </li>
+          ))}
+        </ul>
+        <button onClick={onClose} className="w-full py-2.5 rounded-xl spectrum text-pitch-950 font-bold">{tr('onbGo')}</button>
       </div>
     </div>
   );
@@ -1339,7 +1530,19 @@ function cvFit(ctx,text,maxW){
   let t=text; while(t.length>1 && ctx.measureText(t+'…').width>maxW) t=t.slice(0,-1);
   return t+'…';
 }
-function buildExportCanvas(state, resolved, scale){
+// Draw a QR code (white-on-white quiet zone) for `text` at x,y filling `size`.
+function drawQR(ctx, text, x, y, size){
+  if(typeof qrcode==='undefined' || !text) return false;
+  let qr=null;
+  for(const ec of ['M','L']){ try{ qr=qrcode(0,ec); qr.addData(text); qr.make(); break; }catch(e){ qr=null; } }
+  if(!qr) return false;
+  const n=qr.getModuleCount(), q=4, cell=size/(n+q*2);
+  ctx.fillStyle='#ffffff'; ctx.fillRect(x, y, size, size);
+  ctx.fillStyle='#0a0a16';
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(qr.isDark(r,c)) ctx.fillRect(x+(c+q)*cell, y+(r+q)*cell, cell+0.6, cell+0.6);
+  return true;
+}
+function buildExportCanvas(state, resolved, shareUrl, scale){
   scale = scale||3;
   const { pos, totalW, height } = BK.layout();
   const segs = BK.connectors(pos);
@@ -1355,7 +1558,7 @@ function buildExportCanvas(state, resolved, scale){
   const gHeadH=26, gRowH=30, gRowGap=6;
   const cellH = gHeadH + 4*(gRowH+gRowGap);
   const groupsBlockH = rows*cellH + 28;
-  const footerH = 56;
+  const footerH = 132;
   const H = groupsTop + groupsBlockH + footerH;
 
   const cv=document.createElement('canvas');
@@ -1385,9 +1588,9 @@ function buildExportCanvas(state, resolved, scale){
     ctx.textAlign='right';
     ctx.font='800 14px '+EXPORT_FONT; ctx.fillStyle='#ffd23f'; ctx.fillText('🏆 '+tr('champion'), W-PADX, 38);
     ctx.font='900 34px '+EXPORT_FONT; ctx.fillStyle='#ffffff';
-    ctx.fillText(TEAMS[champion].flag+' '+TEAMS[champion].name, W-PADX, 78);
+    ctx.fillText(TEAMS[champion].flag+' '+tName(champion), W-PADX, 78);
     ctx.font='500 15px '+EXPORT_FONT; ctx.fillStyle='#9aa0c0';
-    ctx.fillText('2.º '+(runnerUp?TEAMS[runnerUp].name:'—')+'    ·    3.º '+(third?TEAMS[third].name:'—'), W-PADX, 112);
+    ctx.fillText('2.º '+(runnerUp?tName(runnerUp):'—')+'    ·    3.º '+(third?tName(third):'—'), W-PADX, 112);
     ctx.textAlign='left';
   }
 
@@ -1409,19 +1612,22 @@ function buildExportCanvas(state, resolved, scale){
     ctx.lineWidth=isFinal?2:1; ctx.strokeStyle=isFinal?'rgba(255,210,63,.7)':'rgba(255,255,255,.15)'; ctx.stroke();
     const label = id===104?tr('finalLabel') : id===103?tr('thirdPlaceLabel') : null;
     if(label){ ctx.textAlign='center'; ctx.font='800 9px '+EXPORT_FONT; ctx.fillStyle=isFinal?'#ffd23f':'#9aa0c0'; ctx.fillText(label, x+cardW/2, y-9); ctx.textAlign='left'; }
-    const drawRow=(code,ry)=>{
-      const rh=cardH/2, cyy=ry+rh/2, win=w&&w===code, lose=w&&code&&w!==code, fav=code&&code===state.favorite;
+    const sc=(state.scores&&state.scores[id])||{};
+    const drawRow=(code,ry,side)=>{
+      const rh=cardH/2, cyy=ry+rh/2, win=w&&w===code, lose=w&&code&&w!==code, fav=code&&code===state.favorite, dh=code&&code===state.darkHorse;
       if(win){ ctx.fillStyle=accent+'0.22)'; ctx.fillRect(x+1, ry, cardW-2, rh-1); }
       if(fav){ ctx.fillStyle='#ffd23f'; ctx.fillRect(x+1, ry+3, 3, rh-6); }
+      else if(dh){ ctx.fillStyle='#36a3ff'; ctx.fillRect(x+1, ry+3, 3, rh-6); }
       ctx.textAlign='left'; ctx.font='18px '+EXPORT_FONT; ctx.fillStyle='#fff';
       ctx.fillText(code?TEAMS[code].flag:'🏳️', x+10, cyy);
       ctx.font='700 15px '+EXPORT_FONT; ctx.fillStyle = !code?'rgba(255,255,255,.3)': lose?'rgba(255,255,255,.45)':'#eef0ff';
       ctx.fillText(code||tr('tbd'), x+36, cyy);
-      if(fav){ ctx.textAlign='right'; ctx.fillStyle='#ffd23f'; ctx.font='12px '+EXPORT_FONT; ctx.fillText('★', x+cardW-8, cyy); ctx.textAlign='left'; }
+      const val = side==='home'?sc.h:sc.a;
+      if(val!=null){ ctx.textAlign='right'; ctx.font='800 14px '+EXPORT_FONT; ctx.fillStyle='#fff'; ctx.fillText(val, x+cardW-9, cyy); ctx.textAlign='left'; }
     };
-    drawRow(t.home, y);
+    drawRow(t.home, y, 'home');
     ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,y+cardH/2); ctx.lineTo(x+cardW,y+cardH/2); ctx.stroke();
-    drawRow(t.away, y+cardH/2);
+    drawRow(t.away, y+cardH/2, 'away');
   });
 
   // ---------- GROUP TABLES (6 × 2 grid) ----------
@@ -1439,16 +1645,74 @@ function buildExportCanvas(state, resolved, scale){
       ctx.fillText(i+1, gx+13, cyy);
       ctx.textAlign='left'; ctx.font='17px '+EXPORT_FONT; ctx.fillStyle='#fff'; ctx.fillText(TEAMS[code].flag, gx+24, cyy);
       const reserve = comp.played?34:10;
-      ctx.font='600 14px '+EXPORT_FONT; ctx.fillStyle = state.favorite===code?'#ffd23f':'#eef0ff';
-      ctx.fillText(cvFit(ctx, TEAMS[code].name, cellW-49-reserve), gx+47, cyy);
+      ctx.font='600 14px '+EXPORT_FONT; ctx.fillStyle = state.favorite===code?'#ffd23f':state.darkHorse===code?'#36a3ff':'#eef0ff';
+      ctx.fillText(cvFit(ctx, tName(code), cellW-49-reserve), gx+47, cyy);
       if(comp.played){ const r=comp.rows.find(x=>x.code===code); ctx.textAlign='right'; ctx.font='800 12px '+EXPORT_FONT; ctx.fillStyle='#cfd3e6'; ctx.fillText((r?r.Pts:0)+'p', gx+cellW-9, cyy); ctx.textAlign='left'; }
     });
   });
 
-  // ---------- FOOTER ----------
-  ctx.textAlign='center'; ctx.font='500 13px '+EXPORT_FONT; ctx.fillStyle='#71768f';
-  ctx.fillText(tr('exportFooter')+(creator? '   ·   '+creator : ''), W/2, H-28);
+  // ---------- FOOTER (QR + disclaimer) ----------
+  const qrSize=96, qrX=W-PADX-qrSize, qrY=H-footerH+14;
+  const hasQR = drawQR(ctx, shareUrl, qrX, qrY, qrSize);
+  if(hasQR){
+    ctx.textAlign='right'; ctx.font='600 13px '+EXPORT_FONT; ctx.fillStyle='#9aa0c0';
+    ctx.fillText(tr('qrScan'), qrX-14, qrY+qrSize/2-9);
+    ctx.font='500 12px '+EXPORT_FONT; ctx.fillStyle='#6b7088';
+    ctx.fillText('wc26-bracket-lime.vercel.app', qrX-14, qrY+qrSize/2+11);
+  }
+  ctx.textAlign='left'; ctx.font='500 13px '+EXPORT_FONT; ctx.fillStyle='#71768f';
+  ctx.fillText(cvFit(ctx, tr('exportFooter')+(creator? '   ·   '+creator:''), W-PADX*2-qrSize-200), PADX, H-30);
   ctx.textAlign='left';
+  return cv;
+}
+
+// Vertical 1080×1920 "story" card for Instagram/WhatsApp.
+function buildStoryCard(state, resolved, shareUrl, scale){
+  scale = scale||2;
+  const W=1080, H=1920;
+  const theme=THEMES[state.theme]||THEMES.magenta;
+  const creator=(state.creator||'').trim();
+  const {champion,runnerUp,third}=resolved;
+  const dna=bracketDNA(resolved);
+  const cv=document.createElement('canvas'); cv.width=W*scale; cv.height=H*scale;
+  const ctx=cv.getContext('2d'); ctx.scale(scale,scale); ctx.textBaseline='middle'; ctx.textAlign='center';
+  const bg=ctx.createLinearGradient(0,0,0,H); bg.addColorStop(0,'#0a0a16'); bg.addColorStop(1,'#16122e'); ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  const glow=(cx,cy,r,rgb,a)=>{const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,'rgba('+rgb+','+a+')');g.addColorStop(1,'rgba('+rgb+',0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);};
+  glow(230,400,580,theme.glow[0],0.30); glow(880,1180,560,theme.glow[1],0.20);
+  const sb=ctx.createLinearGradient(0,0,W,0); theme.c.forEach((c,i)=>sb.addColorStop(i/(theme.c.length-1),c)); ctx.fillStyle=sb; ctx.fillRect(0,0,W,10);
+  // header
+  const tg=ctx.createLinearGradient(W/2-330,0,W/2+330,0); theme.c.forEach((c,i)=>tg.addColorStop(Math.min(1,i/(theme.c.length-1)),c));
+  ctx.font='900 68px '+EXPORT_FONT; ctx.fillStyle=tg; ctx.fillText('WORLD CUP 26', W/2, 122);
+  ctx.font='600 28px '+EXPORT_FONT; ctx.fillStyle='#9aa0c0'; ctx.fillText(creator? creator+'’s bracket' : tr('exportSub'), W/2, 172);
+  // champion hero
+  if(champion){
+    ctx.font='800 28px '+EXPORT_FONT; ctx.fillStyle='#ffd23f'; ctx.fillText('🏆  '+tr('champion'), W/2, 322);
+    ctx.font='196px '+EXPORT_FONT; ctx.fillText(TEAMS[champion].flag, W/2, 506);
+    ctx.font='900 82px '+EXPORT_FONT; ctx.fillStyle='#ffffff'; ctx.fillText(cvFit(ctx,tName(champion),W-110), W/2, 658);
+  }
+  // runner-up + third
+  ctx.font='600 33px '+EXPORT_FONT; ctx.fillStyle='#cfd3e6';
+  if(runnerUp) ctx.fillText(cvFit(ctx,'🥈  '+TEAMS[runnerUp].flag+' '+tName(runnerUp),W-120), W/2, 762);
+  if(third)    ctx.fillText(cvFit(ctx,'🥉  '+TEAMS[third].flag+' '+tName(third),W-120), W/2, 818);
+  // DNA pills
+  const pill=(cx,cy,w,h,label,val)=>{
+    cvRoundRect(ctx,cx-w/2,cy-h/2,w,h,16); ctx.fillStyle='rgba(255,255,255,.06)'; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.font='700 18px '+EXPORT_FONT; ctx.fillStyle='#8a90ad'; ctx.fillText(label, cx, cy-22);
+    ctx.font='800 28px '+EXPORT_FONT; ctx.fillStyle='#ffffff'; ctx.fillText(cvFit(ctx,val,w-28), cx, cy+14);
+  };
+  pill(W/2-216, 928, 408, 112, tr('dnaBoldness'), tr('bold'+dna.tier));
+  pill(W/2+216, 928, 408, 112, tr('dnaOdds'), tr('oneIn',{n:oddsOneIn(dna.logp)}));
+  // QR
+  const qrS=336, qrX=W/2-qrS/2, qrY=1120;
+  const hasQR=drawQR(ctx, shareUrl, qrX, qrY, qrS);
+  if(hasQR){
+    ctx.font='600 28px '+EXPORT_FONT; ctx.fillStyle='#9aa0c0'; ctx.fillText(tr('qrScan'), W/2, qrY+qrS+50);
+    ctx.font='500 23px '+EXPORT_FONT; ctx.fillStyle='#6b7088'; ctx.fillText('wc26-bracket-lime.vercel.app', W/2, qrY+qrS+90);
+  }
+  // footer
+  ctx.font='500 21px '+EXPORT_FONT; ctx.fillStyle='#6b7088';
+  ctx.fillText(cvFit(ctx,'🇨🇦 🇲🇽 🇺🇸  ·  '+tr('exportFooter'), W-70), W/2, H-52);
   return cv;
 }
 
@@ -1475,6 +1739,8 @@ function App(){
   const [busy, setBusy] = useState(false);
   const [showOdds, setShowOdds] = useState(false);
   const [showCompare, setShowCompare] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
+  const [showOnboard, setShowOnboard] = useState(()=>{ try{ return !localStorage.getItem('wc26-onboarded'); }catch(e){ return false; } });
 
   // persist
   useEffect(()=>{ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }, [state]);
@@ -1487,6 +1753,11 @@ function App(){
   }, [state.theme]);
   // reflect language on <html lang> for a11y/SEO
   useEffect(()=>{ try{ document.documentElement.lang = state.lang||'en'; }catch(e){} }, [state.lang]);
+  // light / dark mode
+  useEffect(()=>{ try{ document.documentElement.classList.toggle('light', state.mode==='light'); }catch(e){} }, [state.mode]);
+  // Esc closes any open modal (a11y)
+  useEffect(()=>{ const h=e=>{ if(e.key==='Escape'){ setShowOdds(false); setShowCompare(false); setShowSaved(false); setShowOnboard(false); } }; window.addEventListener('keydown',h); return ()=>window.removeEventListener('keydown',h); }, []);
+  const closeOnboard = ()=>{ setShowOnboard(false); try{ localStorage.setItem('wc26-onboarded','1'); }catch(e){} };
 
   LANG = I18N[state.lang] ? state.lang : 'en';             // set active language before children render
   const resolved = useMemo(()=>resolveBracket(state), [state]);
@@ -1516,16 +1787,28 @@ function App(){
     return {...s, groupScores:gs, standings, thirdRanking:computeThirdRanking(standings, gs)};
   });
   const autoRankThirds = ()=> setState(s=>({...s, thirdRanking:computeThirdRanking(s.standings, s.groupScores)}));
-  const setFavorite = code => setState(s=>({...s, favorite:code||null}));
+  const setFavorite = code => setState(s=>({...s, favorite:code||null, darkHorse: s.darkHorse===code?null:s.darkHorse}));
+  const setDarkHorse = code => setState(s=>({...s, darkHorse:code||null, favorite: s.favorite===code?null:s.favorite}));
   const setTheme = th => setState(s=>({...s, theme:th}));
+  const setMode = () => setState(s=>({...s, mode: s.mode==='light'?'dark':'light'}));
   const setLang = l => setState(s=>({...s, lang:l}));
   const setCreator = v => setState(s=>({...s, creator:v.slice(0,28)}));
   const onPick = (id, code)=> setState(s=>{
-    const picks={...s.picks};
+    const picks={...s.picks}, scores={...s.scores};
     if(picks[id]===code) delete picks[id]; else picks[id]=code;
-    return {...s, picks:clearDownstream(id, {...s, picks})};
+    delete scores[id];                       // a tapped winner overrides any entered score
+    return {...s, scores, picks:clearDownstream(id, {...s, picks})};
   });
+  const setScore = (id, field, value)=> setState(s=> applyScore(s, id, {[field]:value}));
+  const setPen   = (id, side)=> setState(s=> applyScore(s, id, {pen:side}));
 
+  const loadBracketState = (st)=>{
+    const ns=normalize(st); setState(ns);
+    let r; try{ r=resolveBracket(ns); }catch(e){ r={}; }
+    setMaxStep(r.champion?3:Object.keys(ns.picks||{}).length?2:0);
+    setStep(r.champion?'results':'groups'); setShowSaved(false);
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
   const doRandom = ()=>{ setState(simulate('random')); setMaxStep(3); flash(tr('toastRandom')); setStep('results'); };
   const doSim    = ()=>{ setState(simulate('sim'));    setMaxStep(3); flash(tr('toastSim')); setStep('results'); };
   const doReset  = ()=>{ setState({...defaultState(), lang:state.lang, theme:state.theme}); setMaxStep(0); flash(tr('toastReset')); setStep('groups'); };
@@ -1536,23 +1819,26 @@ function App(){
     catch(e){ location.hash='s='+encodeState(state); flash(tr('toastShareBar')); }
   };
 
-  const exportImage = async (asPdf)=>{
+  const exportImage = async (kind)=>{                // 'png' | 'pdf' | 'story'
     if(!complete){ flash(tr('toastExportLock')); return; }
     setBusy(true); flash(tr('toastRendering'));
     await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,30)));
     try{
-      const SC = 3;                                  // 3× supersampling → crisp output
-      const cv = buildExportCanvas(state, resolved, SC);
-      const png = cv.toDataURL('image/png');
-      const Wp = cv.width/SC, Hp = cv.height/SC;     // logical page size
-      if(asPdf){
-        const {jsPDF}=window.jspdf;
-        const pdf=new jsPDF({orientation: Wp>Hp?'l':'p', unit:'px', format:[Wp,Hp], compress:true});
-        pdf.addImage(png,'PNG',0,0,Wp,Hp,undefined,'FAST');  // full-res image scaled to page → high DPI
-        pdf.save('wc2026-bracket.pdf'); flash(tr('toastPdf'));
+      const shareUrl = location.origin+location.pathname+'#s='+encodeState(state);
+      const dl = (href,name)=>{ const a=document.createElement('a'); a.href=href; a.download=name; a.click(); };
+      if(kind==='story'){
+        const cv = buildStoryCard(state, resolved, shareUrl, 2);
+        dl(cv.toDataURL('image/png'), 'wc2026-story.png'); flash(tr('toastPng'));
       } else {
-        const a=document.createElement('a'); a.href=png; a.download='wc2026-bracket.png'; a.click();
-        flash(tr('toastPng'));
+        const SC = 3;                                // 3× supersampling → crisp output
+        const cv = buildExportCanvas(state, resolved, shareUrl, SC);
+        const png = cv.toDataURL('image/png');
+        if(kind==='pdf'){
+          const {jsPDF}=window.jspdf; const Wp=cv.width/SC, Hp=cv.height/SC;
+          const pdf=new jsPDF({orientation: Wp>Hp?'l':'p', unit:'px', format:[Wp,Hp], compress:true});
+          pdf.addImage(png,'PNG',0,0,Wp,Hp,undefined,'FAST');
+          pdf.save('wc2026-bracket.pdf'); flash(tr('toastPdf'));
+        } else { dl(png, 'wc2026-bracket.png'); flash(tr('toastPng')); }
       }
     } catch(e){ console.error(e); flash(tr('toastExportFail')); }
     setBusy(false);
@@ -1581,9 +1867,11 @@ function App(){
             <ToolBtn onClick={doSim}>🤖 {tr('btnSim')}</ToolBtn>
             <ToolBtn onClick={()=>setShowOdds(true)}>📊 {tr('btnOdds')}</ToolBtn>
             <ToolBtn onClick={()=>setShowCompare(true)}>🆚 {tr('compare')}</ToolBtn>
+            <ToolBtn onClick={()=>setShowSaved(true)}>💾 {tr('btnBrackets')}</ToolBtn>
             <ToolBtn onClick={doShare}>🔗 {tr('btnShare')}</ToolBtn>
-            <ToolBtn onClick={()=>exportImage(false)} disabled={!complete||busy}>🖼️ PNG</ToolBtn>
-            <ToolBtn onClick={()=>exportImage(true)} disabled={!complete||busy}>📄 PDF</ToolBtn>
+            <ToolBtn onClick={()=>exportImage('png')} disabled={!complete||busy}>🖼️ PNG</ToolBtn>
+            <ToolBtn onClick={()=>exportImage('pdf')} disabled={!complete||busy}>📄 PDF</ToolBtn>
+            <ToolBtn onClick={()=>exportImage('story')} disabled={!complete||busy}>📱 {tr('btnStory')}</ToolBtn>
             <ToolBtn onClick={doReset} danger>↺ {tr('btnReset')}</ToolBtn>
           </div>
         </div>
@@ -1594,18 +1882,26 @@ function App(){
             className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[11px] text-white/80 outline-none focus:border-neon/50 w-[120px]" />
           <span className="w-px h-4 bg-white/10 mx-1" />
           <span className="text-[11px] text-white/40 font-semibold">★ {tr('favourite')}</span>
-          <select value={state.favorite||''} onChange={e=>setFavorite(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[11px] text-white/80 outline-none focus:border-neon/50 max-w-[160px]">
+          <select value={state.favorite||''} onChange={e=>setFavorite(e.target.value)} aria-label={tr('favourite')}
+            className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[11px] text-white/80 outline-none focus:border-neon/50 max-w-[150px]">
             <option value="">{tr('none')}</option>
-            {Object.keys(TEAMS).sort((a,b)=>TEAMS[a].name.localeCompare(TEAMS[b].name)).map(c=>(
-              <option key={c} value={c}>{TEAMS[c].flag} {TEAMS[c].name}</option>
+            {Object.keys(TEAMS).sort((a,b)=>tName(a).localeCompare(tName(b))).map(c=>(
+              <option key={c} value={c}>{TEAMS[c].flag} {tName(c)}</option>
+            ))}
+          </select>
+          <span className="text-[11px] text-electric font-semibold" title={tr('darkHorse')}>◆</span>
+          <select value={state.darkHorse||''} onChange={e=>setDarkHorse(e.target.value)} aria-label={tr('darkHorse')}
+            className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[11px] text-white/80 outline-none focus:border-electric/60 max-w-[150px]">
+            <option value="">{tr('none')}</option>
+            {Object.keys(TEAMS).sort((a,b)=>tName(a).localeCompare(tName(b))).map(c=>(
+              <option key={c} value={c}>{TEAMS[c].flag} {tName(c)}</option>
             ))}
           </select>
           <span className="w-px h-4 bg-white/10 mx-1" />
           <span className="text-[11px] text-white/40 font-semibold">{tr('theme')}</span>
           <div className="flex items-center gap-1">
             {Object.entries(THEMES).map(([k,th])=>(
-              <button key={k} title={th.label} onClick={()=>setTheme(k)}
+              <button key={k} title={th.label} aria-label={th.label} aria-pressed={state.theme===k} onClick={()=>setTheme(k)}
                 className={'w-5 h-5 rounded-full border-2 transition '+(state.theme===k?'border-white scale-110':'border-white/20 hover:border-white/50')}
                 style={{background:`linear-gradient(135deg,${th.c[0]},${th.c[2]},${th.c[3]})`}} />
             ))}
@@ -1614,10 +1910,16 @@ function App(){
           <span className="text-[11px] text-white/40 font-semibold">{tr('language')}</span>
           <div className="flex items-center gap-0.5">
             {LANGS.map(([code,lbl])=>(
-              <button key={code} onClick={()=>setLang(code)}
+              <button key={code} onClick={()=>setLang(code)} aria-pressed={state.lang===code}
                 className={'px-1.5 py-0.5 rounded text-[10px] font-bold border transition '+(state.lang===code?'bg-neon text-pitch-950 border-neon':'border-white/15 text-white/55 hover:border-neon/40')}>{lbl}</button>
             ))}
           </div>
+          <span className="w-px h-4 bg-white/10 mx-1" />
+          <button onClick={setMode} title={state.mode==='light'?tr('modeToDark'):tr('modeToLight')}
+            aria-label={state.mode==='light'?tr('modeToDark'):tr('modeToLight')}
+            className="px-2 py-1 rounded-lg text-xs border border-white/15 text-white/70 hover:border-neon/40 hover:text-neon transition">
+            {state.mode==='light'?'🌙':'☀️'}
+          </button>
         </div>
         {/* STEP NAV */}
         <div className="max-w-6xl mx-auto px-4 pb-2 flex gap-1.5">
@@ -1639,9 +1941,9 @@ function App(){
       {/* BODY */}
       <main className="max-w-6xl mx-auto px-4 py-6">
         {step==='groups'   && <GroupStage state={state} setStandings={setStandings} setGroupScore={setGroupScore} clearGroupScores={clearGroupScores} />}
-        {step==='thirds'   && <ThirdPlace state={state} setThirdRanking={setThirdRanking} autoRankThirds={autoRankThirds} favorite={state.favorite} />}
-        {step==='knockout' && <Knockout resolved={resolved} onPick={onPick} favorite={state.favorite} />}
-        {step==='results'  && <Results resolved={resolved} favorite={state.favorite} themeKey={state.theme} />}
+        {step==='thirds'   && <ThirdPlace state={state} setThirdRanking={setThirdRanking} autoRankThirds={autoRankThirds} favorite={state.favorite} darkHorse={state.darkHorse} />}
+        {step==='knockout' && <Knockout resolved={resolved} onPick={onPick} favorite={state.favorite} darkHorse={state.darkHorse} scores={state.scores} setScore={setScore} setPen={setPen} />}
+        {step==='results'  && <Results resolved={resolved} favorite={state.favorite} darkHorse={state.darkHorse} themeKey={state.theme} />}
       </main>
 
       {/* STAGE FOOTER (gated progression) */}
@@ -1657,6 +1959,8 @@ function App(){
 
       {showOdds && <OddsModal onClose={()=>setShowOdds(false)} favorite={state.favorite} />}
       {showCompare && <CompareModal onClose={()=>setShowCompare(false)} mine={resolved} />}
+      {showSaved && <SavedModal onClose={()=>setShowSaved(false)} current={state} onLoad={loadBracketState} flash={flash} />}
+      {showOnboard && <OnboardingModal onClose={closeOnboard} />}
 
       {toast && <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 glass px-4 py-2 rounded-full text-sm font-semibold pop glow">{toast}</div>}
     </div>
@@ -1723,6 +2027,21 @@ function NavBtn({dir, step, setStep}){
     {dir==='prev'?'← '+tgt.label : tgt.label+' →'}</button>;
 }
 
+/* apply a knockout score/penalty change → derive the winner → keep bracket consistent */
+function applyScore(s, id, patch){
+  const scores = {...s.scores, [id]:{...(s.scores[id]||{}), ...patch}};
+  const cur = scores[id];
+  let picks = {...s.picks};
+  const t = resolveBracket({...s, scores}).teams[id];
+  if(t && cur.h!=null && cur.a!=null){
+    if(cur.h>cur.a) picks[id]=t.home;
+    else if(cur.a>cur.h) picks[id]=t.away;
+    else { if(cur.pen==='home') picks[id]=t.home; else if(cur.pen==='away') picks[id]=t.away; else delete picks[id]; }
+  }
+  picks = clearDownstream(id, {...s, picks});
+  return {...s, scores, picks};
+}
+
 /* clear picks downstream of a changed match so the bracket stays consistent */
 function clearDownstream(changedId, state){
   const picks = {...state.picks};
@@ -1743,6 +2062,14 @@ function clearDownstream(changedId, state){
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+<script>
+  /* Register the service worker for offline + installability (HTTPS only). */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
 </script>
 </body>
 </html>
