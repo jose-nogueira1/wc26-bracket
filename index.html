@@ -897,15 +897,18 @@ function Knockout({resolved, onPick, favorite}){
    EXPORT SHEET (groups on both ends · bracket in the middle)
    ============================================================ */
 function GroupMini({letter, order}){
+  const ROW = 36;   // fixed row height; line-height centering renders reliably in html2canvas
   return (
-    <div style={{marginBottom:18}}>
-      <div style={{fontSize:14,fontWeight:800,letterSpacing:'.08em',color:'#ff6aa9',marginBottom:7}}>GROUP {letter}</div>
+    <div style={{marginBottom:16}}>
+      <div style={{fontSize:14,fontWeight:800,letterSpacing:'.08em',color:'#ff6aa9',marginBottom:6}}>{tr('groupWord')} {letter}</div>
       {order.map((code,i)=>(
-        <div key={code} style={{display:'flex',alignItems:'center',gap:9,padding:'7px 9px',marginBottom:4,borderRadius:7,
-            background:i<2?'rgba(255,46,136,.15)':i===2?'rgba(255,210,63,.12)':'rgba(255,255,255,.04)'}}>
-          <span style={{width:15,flexShrink:0,textAlign:'center',fontSize:12,fontWeight:800,color:i<2?'#ff6aa9':i===2?'#ffd23f':'#7b8099'}}>{i+1}</span>
-          <span style={{fontSize:18,flexShrink:0,lineHeight:1}}>{TEAMS[code].flag}</span>
-          <span style={{fontSize:15,fontWeight:600,lineHeight:1.25,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',minWidth:0}}>{TEAMS[code].name}</span>
+        <div key={code} style={{
+            height:ROW, lineHeight:ROW+'px', marginBottom:5, borderRadius:7, padding:'0 10px',
+            whiteSpace:'nowrap', overflow:'hidden',
+            background:i<2?'rgba(255,46,136,.15)':i===2?'rgba(255,210,63,.12)':'rgba(255,255,255,.05)'}}>
+          <span style={{display:'inline-block', width:16, textAlign:'center', fontSize:12, fontWeight:800, verticalAlign:'middle', color:i<2?'#ff6aa9':i===2?'#ffd23f':'#7b8099'}}>{i+1}</span>
+          <span style={{display:'inline-block', fontSize:18, verticalAlign:'middle', margin:'0 8px 0 5px'}}>{TEAMS[code].flag}</span>
+          <span style={{display:'inline-block', fontSize:15, fontWeight:600, lineHeight:'normal', verticalAlign:'middle', maxWidth:262, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{TEAMS[code].name}</span>
         </div>
       ))}
     </div>
